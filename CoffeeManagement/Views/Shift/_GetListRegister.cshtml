@@ -1,0 +1,61 @@
+﻿@model List<ShiftRegistration>
+@{
+}
+
+
+
+<table id="table-student" class="table table-bordered table-sm table-hover">
+    <thead class="table-primary">
+        <tr>
+            <th class="text-center">Mã NV</th>
+            <th class="text-center">Họ và tên</th>
+            <th class="text-center">Ngày sinh</th>
+            <th class="text-center">Vị trí</th>
+            <th class="text-center">Chấp nhận</th>
+            <th class="text-center">Từ chối</th>
+            <th class="text-center">Lý do từ chối</th>
+        </tr>
+    </thead>
+    <tbody class="list-student">
+        @foreach (var item in Model)
+        {
+            <tr class="row-student" data-id="@item.EmployeeId">
+                <td>@item.EmployeeId</td>
+                <td>@item.Employee.FullName</td>
+                <td>@item.Employee.DayOfBirth?.ToString("dd/MM/yyyy")</td>
+                <td>@item.Employee.Position?.Name</td>
+                <td class="text-center">
+                    <div class="checkbox-wrapper-31">
+                        <input type="checkbox" name="approved_@item.EmployeeId" data-registerid="@item.Id" value="true" @(item.IsApproved == true ? "checked" : "") />
+                        <svg viewBox="0 0 35.6 35.6">
+                            <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                            <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                            <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                        </svg>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="checkbox-wrapper-31">
+                        <input type="checkbox" name="approved_@item.EmployeeId" data-registerid="@item.Id" value="false" @(item.IsApproved == false ? "checked" : "") />
+                        <svg viewBox="0 0 35.6 35.6">
+                            <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                            <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                            <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                        </svg>
+                    </div>
+                </td>
+                
+                    @{
+                        bool isDisable = true;
+                        if (item.IsApproved == false)
+                        {
+                            isDisable = false;
+                        }
+                    }
+                <td>
+                    <input type="text" class="reject-reason form-control-sm" name="RejectReason_@item.EmployeeId" placeholder="..........." @(isDisable ? "disabled" : "") value="@item.ShiftConfirmations.LastOrDefault()?.RejectReason" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

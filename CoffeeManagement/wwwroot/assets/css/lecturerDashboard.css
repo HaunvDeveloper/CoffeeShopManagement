@@ -1,0 +1,45 @@
+﻿.app-main{
+    background-color: #f8f9fa;
+}
+
+.app-main .card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-main .card-title {
+    color: #343a40;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.app-main img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.app-main h1 {
+    color: #007bff;
+}
+
+.app-main p {
+    margin: 0;
+    padding: 2px 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 12px;
+}
+
+.app-main .row {
+    margin-bottom: 20px;
+}
+
+h5.card-title {
+    all: unset;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #343a40;
+}

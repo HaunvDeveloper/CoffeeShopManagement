@@ -1,0 +1,98 @@
+﻿@model Inventory
+@{
+    ViewData["Title"] = "Sửa nguyên liệu";
+}
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+    <link rel="stylesheet" href="~/assets/css/checkbox.css">
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+}
+
+
+<div class="container">
+    <div class="table-container m-4">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">SỬA NGUYÊN LIỆU</h4>
+        <form asp-action="Edit" asp-controller="Inventory" method="post" id="form-create" class="container">
+            <input type="hidden" asp-for="Id"/>
+            <input type="hidden" asp-for="CreatedAt"/>
+            <hr />
+            <div class="row info-detail">
+                <div class="col-lg-6">
+                    <div class="form-group mb-3">
+                        <span class="text-no-wrap text-danger">Mã nguyên liệu</span>
+                        <input asp-for="Code" class="form-control" required placeholder="Nhập mã nguyên liệu..." />
+                    </div>
+                    <div class="form-group mb-3">
+                        <span class="text-no-wrap text-danger">Tên nguyên liệu</span>
+                        <input asp-for="Name" class="form-control" required placeholder="Nhập tên nguyên liệu..." />
+                    </div>
+
+                </div>
+                <div class="col-lg-6">
+
+                    <div class="form-group mb-3">
+                        <span class="text-no-wrap">Số lượng ban đầu</span>
+                        <input asp-for="Quantity" class="form-control" required type="number" step="any" min="0" placeholder="Nhập số lượng nguyên liệu..." />
+                    </div>
+                    <div class="form-group mb-3">
+                        <span class="text-no-wrap text-danger">Đơn vị</span>
+                        <input asp-for="Unit" class="form-control" required placeholder="Nhập đơn vị..." />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-3 text-lg-end">
+                <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+                <button id="btn-create" type="submit" class="btn btn-primary ">Lưu</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+
+
+        $(document).ready(function () {
+            $('form').submit(function (event) {
+                event.preventDefault(); // Ngăn form gửi theo cách mặc định
+                var url = $(this).attr('action');
+                // Tạo đối tượng FormData từ form
+                var formData = new FormData(this);
+
+                // Gửi AJAX
+                $.ajax({
+                    url: url,
+                    method: 'post',
+                    data: formData,
+                    contentType: false, // Không đặt contentType để FormData hoạt động chính xác
+                    processData: false, // Không xử lý dữ liệu vì FormData sẽ làm việc này
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert("success", "Tạo thành công");
+                            setTimeout(function () {
+                                window.location.href = response.redirect;
+                            }, 1500);
+                        } else {
+                            showAlert("error", response.error);
+                        }
+                    },
+                    error: function () {
+                        showAlert("error", "Có lỗi xảy ra khi gửi yêu cầu.");
+                    }
+                });
+            });
+            
+        });
+
+    </script>
+}

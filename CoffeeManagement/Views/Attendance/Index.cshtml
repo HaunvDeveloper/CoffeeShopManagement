@@ -1,0 +1,190 @@
+﻿@{
+    ViewData["Title"] = "Chấm công";
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+}
+
+<div class="container">
+    <div class="table-container m-4 table-responsive">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">CHECKIN</h4>
+        <table id="tableData" class="table table-striped mb-5">
+            <thead class="table-primary">
+                <tr class="table-primary">
+                    <th>Mã</th>
+                    <th>Ngày làm</th>
+                    <th>Ca làm</th>
+                    <th>Giờ bắt đầu</th>
+                    <th>Giờ kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded dynamically by DataTable -->
+            </tbody>
+        </table>
+
+        
+    </div>
+    <div class="table-container m-4 table-responsive">
+        <h4 class="text-center mb-4 text-danger" style="font-size:30px;font-weight:bold;">CHECKOUT</h4>
+
+        <table id="tableData2" class="table table-striped">
+            <thead class="table-primary">
+                <tr class="table-primary">
+                    <th>Mã</th>
+                    <th>Ngày làm</th>
+                    <th>Ca làm</th>
+                    <th>Giờ bắt đầu</th>
+                    <th>Giờ kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded dynamically by DataTable -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+        var table = $('#tableData').DataTable({
+            "processing": true,
+            "serverSide": false, // Tắt xử lý phân trang từ server
+            "searching": true,
+            "paging": false,     // Tắt phân trang
+            "info": false,       // (Tùy chọn) tắt dòng thông tin phía dưới
+            "ajax": {
+                "url": '@Url.Action("_GetIncommingWorkSchedule", "Attendance")',
+                "type": "POST",
+                "data": function (d) {
+                    d.keyword = $('input[type="search"]').val();
+                },
+                "dataSrc": function (json) {
+                    return json.data;
+                }
+            },
+            "columns": [
+                { "data": "Id" },
+                { "data": "WorkDate" },
+                { "data": "ShiftName" },
+                { "data": "StartTime" },
+                { "data": "EndTime" },
+                {
+                    "data": "RemainingTime",
+                    "render": function (data, type, row) {
+                        if (!data) return '';
+                        const parts = data.split(':');
+                        const hours = parseInt(parts[0]);
+                        const minutes = parseInt(parts[1]);
+                        const prefix = row.IsLate ? '<span class="text-danger">Trễ</span>' : '<span class="text-success">Còn</span>';
+                        return `${prefix}: ${Math.abs(hours)} giờ ${Math.abs(minutes)} phút`;
+                    }
+                },
+                {
+                    "data": "Id",
+                    "orderable": false,
+                    "render": function (data, type, row) {
+                        return `
+                            <button data-id="${data}" class="btn-checkin btn btn-outline-primary btn-sm">Checkin</button>
+                        `;
+                    }
+                }
+            ]
+        });
+
+
+        var table2 = $('#tableData2').DataTable({
+            "processing": true,
+            "serverSide": false, // Tắt xử lý phân trang từ server
+            "searching": true,
+            "paging": false,     // Tắt phân trang
+            "info": false,       // (Tùy chọn) tắt dòng thông tin phía dưới
+            "ajax": {
+                "url": '@Url.Action("_GetOutGoingWorkSchedule", "Attendance")',
+                "type": "POST",
+                "data": function (d) {
+                    d.keyword = $('input[type="search"]').val();
+                },
+                "dataSrc": function (json) {
+                    return json.data;
+                }
+            },
+            "columns": [
+                { "data": "Id" },
+                { "data": "WorkDate" },
+                { "data": "ShiftName" },
+                { "data": "StartTime" },
+                { "data": "EndTime" },
+                {
+                    "data": "Overtime",
+                    "render": function (data, type, row) {
+                        if (!data) return '';
+                        const parts = data.split(':');
+                        const hours = parseInt(parts[0]);
+                        const minutes = parseInt(parts[1]);
+                        return `<span class="text-warning">Đã quá: ${hours} giờ ${minutes} phút</span>`;
+                    }
+                },
+                {
+                    "data": "Id",
+                    "render": function (data) {
+                        return `
+                            <button data-id="${data}" class="btn-checkout btn btn-outline-primary btn-sm">Checkout</button>
+                        `;
+                    }
+                }
+            ]
+
+        });
+
+
+        $(document).on('click', '.btn-checkin', function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '@Url.Action("CheckIn", "Attendance")',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        table.ajax.reload();
+                        showToast('success' ,'Check-in thành công!');
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi khi thực hiện check-in.');
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-checkout', function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '@Url.Action("CheckOut", "Attendance")',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        table2.ajax.reload();
+                        showToast('success' ,'Check-out thành công!');
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi khi thực hiện check-out.');
+                }
+            });
+        });
+
+    </script>
+}

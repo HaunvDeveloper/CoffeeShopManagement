@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Danh sách khách hàng";
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+}
+
+<div class="container">
+    <div class="table-container m-4 table-responsive">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">DANH SÁCH KHÁCH HÀNG</h4>
+        <div class="d-flex justify-content-between mb-3 align-items-center flex-wrap gap-2">
+            <a asp-action="Create" asp-controller="Customer" class="btn btn-add-course">+ Thêm khách hàng</a>
+        </div>
+
+        <!-- Table to display employee data using DataTable -->
+        <table id="tableData" class="table table-striped">
+            <thead class="table-primary">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Số KH</th>
+                    <th>Tên đầy đủ</th>
+                    <th>Số điện thoại</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded dynamically by DataTable -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        var table = $('#tableData').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": true,  // Enable the default search box of DataTable
+            "ajax": {
+                "url": '@Url.Action("_GetList", "Customer")', // AJAX call to _GetList action
+                "data": function (d) {
+                    d.keyword = $('input[type="search"]').val(); // Pass the search keyword to the server
+                },
+                "type": "POST",
+                "dataSrc": function (json) {
+                    return json.data; // Đảm bảo dữ liệu trả về theo đúng định dạng DataTable yêu cầu
+                }
+            },
+            "pageLength": 25, // Default page size
+            "lengthMenu": [10, 25, 50, 100], // Options for page size
+            "columns": [
+                { "data": "Id" },
+                { "data": "CustomerNo" },
+                { "data": "Name" },
+                { "data": "PhoneNo" },
+                { "data": "Email" },
+                { "data": "Address" },
+                {
+                    "data": "Id",
+                    "render": function (data, type, row) {
+                        // Create the "Edit" button with dynamic link
+                        return `<a href="/Customer/Edit/` + data + `" class="btn btn-outline-primary"><i class="bi bi-pencil-fill"></i></a>
+                               <button onclick="deleteRow(`+ data + `)" class="btn-delete btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                                                    `;
+                    }
+                }
+            ]
+        });
+
+        async function deleteRow(id) {
+            if (id) {
+                let confirmed = await confirmAction();
+                if (confirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Customer")',
+                        method: 'post',
+                        data: { id },
+                        success: function (response) {
+                            if (response.success) {
+                                table.ajax.reload(null, false);
+                            } else {
+                                showAlert("error", "Có lỗi", response.error);
+                            }
+                        },
+                        error: function (error) {
+                            showAlert("error", "Có lỗi", error);
+                        }
+                    });
+                }
+            }
+        };
+
+
+
+
+    </script>
+}

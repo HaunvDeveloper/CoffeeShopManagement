@@ -1,0 +1,93 @@
+
+body{
+    overflow-x: hidden
+}
+
+header {
+    width: 100%;
+    margin: 0;
+}
+
+#header-info {
+    height: 120px;
+    position: relative;
+    display: grid;
+    place-items:center;
+}
+
+#header-info h1 {
+    font-size: 50px;
+    font-family: "Sedgwick Ave", cursive;
+    font-weight: 400;
+    font-style: normal;
+    
+}
+#header-info #logo{
+    width: 150px;
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 900px) {
+    #header-info #logo{
+        display: none;
+    }
+}
+
+.thanhtieude {
+    color: white;
+    font-weight: 600 !important;
+    font-size: 18px;
+    gap: 8px;
+    display: flex;
+    align-items: center;
+}
+
+#header-bar .nav-item {
+    transition: all 0.4s;
+}
+
+#header-bar .nav-item:hover {
+    background-color: rgb(14, 56, 90);
+}
+
+header .dropdown-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1.5s ease;
+    display: block;
+    opacity: 0;
+}
+
+header .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    max-height: 200px;
+    /* Set this to the height you expect when expanded */
+}
+
+@media (min-width: 1400px) {
+    .my-container-header {
+        max-width: 1450px !important;
+    }
+}
+.search-bt{
+    background-color:rgba(18, 72, 116, 1) !important;
+    border: none;
+    padding: 5px 11px;
+}
+.search-bt:hover{
+    background-color: rgb(11, 51, 84)!important;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 11px;
+}
+
+.btn-primary{
+    background-color: rgba(18, 72, 116, 1) !important;
+}
+
+.btn-danger{
+    background-color: #CF373D !important;
+}

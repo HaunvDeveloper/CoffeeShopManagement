@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "Xác nhận đăng ký ca làm việc";
+    DateTime nextMonday = DateTime.Parse(ViewBag.NextMonday);
+    DateTime nextSunday = DateTime.Parse(ViewBag.NextSunday);
+    
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+    <link rel="stylesheet" href="~/assets/css/checkbox.css">
+
+    <style>
+        .btn-sm{
+            width:120px;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="table-container m-4 ">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">XÁC NHẬN ĐĂNG KÝ CA TRỰC</h4>
+        <h5>Xem đăng ký ca làm việc (Tuần từ @nextMonday.ToString("dd/MM/yyyy") đến @nextSunday.ToString("dd/MM/yyyy"))</h5>
+        <div id="checking-list" class="table-responsive">
+            <div class="text-info d-flex justify-content-center align-items-center gap-2" style="padding: 10px;border: 1px dotted;border-radius: 5px;">
+                <div class="loader"></div> <h5>Đang tải dữ liệu.........</h5>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Modal to show registered employees -->
+<div class="modal modal-lg fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeModalLabel">Danh sách nhân viên đăng ký</h5>
+            </div>
+            <div class="modal-body" id="employeeList">
+                <!-- Danh sách nhân viên sẽ được hiển thị ở đây -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-save-checking" class="btn btn-primary btn-close-modal" data-dismiss="modal">Lưu</button>
+                <button type="button" class="btn btn-secondary btn-close-modal" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function loadData() {
+            $('#checking-list').html(`<div class="text-info d-flex justify-content-center align-items-center gap-2" style="padding: 10px;border: 1px dotted;border-radius: 5px;">
+                        <div class="loader"></div> <h5>Đang tải dữ liệu.........</h5>
+                    </div>`);
+            $.ajax({
+                url: '@Url.Action("_GetListChecking", "Shift")',
+                method: 'GET',
+                success: function (response) {
+                    $('#checking-list').html(response);
+                },
+                error: function (error) {
+                    console.log(error);
+                    $('#checking-list').text('Có lỗi');
+                }
+            });
+        }
+        
+        $(document).ready(function () {
+            loadData();
+        });
+
+        $('.btn-close-modal').on('click', function () {
+            $('#employeeModal').modal('hide');
+        });
+
+        $(document).on('click', '.cell-shift', function (event) {
+            var button = $(this); 
+            var shiftId = button.data('shiftid'); 
+            var date = button.data('date');
+            $('#employeeModal').modal('show');
+            $('#employeeList').html(`<h3 class="text-center text-danger">Đang tải dữ liệu...</h3>`);
+            $.ajax({
+                url: '@Url.Action("_GetListRegister", "Shift")',
+                method: 'post',
+                data: { shiftId , date},
+                success: function (res) {
+                    $('#employeeList').html(res);
+                }
+            })
+        });
+
+
+        $('#btn-save-checking').on('click', function () {
+            var data = [];
+            $('input[type=checkbox]:checked').each(function (index, element) {
+                var ob = {
+                    RegistrationId: $(element).data('registerid'),
+                    IsApproved: $(element).val(),
+                    RejectReason: $(element).closest('tr').find('.reject-reason').val()
+                }
+                data.push(ob);
+            });
+            console.log(data);
+            $.ajax({
+                url: '@Url.Action("ApprovedRegister", "Shift")',
+                method: 'post',
+                data: { confirmations: data },
+                success: function (response){
+                    if (response.success) {
+                        showToast("success", "Lưu thành công");
+                        loadData();
+                    } else {
+                        showAlert("error", "Có lỗi", response.error);
+                    }
+                },
+                error: function (error) {
+                    showAlert("error", "Có lỗi", error);
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).on('change', 'input[type=checkbox]', function () {
+            var name = $(this).attr('name');
+
+            if ($(this).is(':checked')) {
+                $('input[type=checkbox][name="' + name + '"]').not(this).prop('checked', false);
+
+                if ($(this).val() === "false") {
+                    $(this).closest('tr').find('.reject-reason').prop('disabled', false);
+                } else {
+                    $(this).closest('tr').find('.reject-reason').prop('disabled', true);
+                }
+            } else {
+                $(this).closest('tr').find('.reject-reason').prop('disabled', true);
+                $(this).closest('tr').find('.reject-reason').val('');
+            }
+        });
+    </script>
+}

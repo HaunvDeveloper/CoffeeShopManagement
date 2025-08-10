@@ -1,0 +1,139 @@
+﻿@{
+    ViewBag.Title = "Đăng ký ca làm việc";
+    DateTime nextMonday = DateTime.Parse(ViewBag.NextMonday);
+    DateTime nextSunday = DateTime.Parse(ViewBag.NextSunday);
+    var listShift = (List<Shift>)ViewBag.Shifts;
+    string[] dayNames = new string[] { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+    var registered = (List<ShiftRegistration>)ViewBag.Registered;
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+    <link rel="stylesheet" href="~/assets/css/checkbox.css">
+}
+
+
+<div class="container">
+    <div class="table-container m-4">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">ĐĂNG KÝ CA TRỰC</h4>
+        <h5>Đăng ký ca làm việc (Tuần từ @nextMonday.ToString("dd/MM/yyyy") đến @nextSunday.ToString("dd/MM/yyyy"))</h5>
+
+        <div>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr class="table-primary">
+                        <th scope="col">Ca</th>
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            DateTime currentDay = nextMonday.AddDays(i);
+                            <th scope="col">
+                                @dayNames[(int)currentDay.DayOfWeek] <br />
+                                <small>@currentDay.ToString("dd/MM/yyyy")</small>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var shift in listShift)
+                    {
+                        <tr data-id="@shift.Id">
+                            <th scope="row" class="text-lg-start">
+                                <b class="text-dark text-lg-start">@shift.Name</b><br />
+                                <small class="text-dark text-lg-start">@shift.StartTime.ToShortTimeString() - @shift.EndTime.ToShortTimeString()</small>
+                            </th>
+                            @for (int i = 0; i < 7; i++)
+                            {
+                                DateTime currentDay = nextMonday.AddDays(i);
+                                
+                                var exist = registered.FirstOrDefault(x => x.WorkDate == DateOnly.FromDateTime(currentDay) && x.ShiftId == shift.Id);
+                                
+                                <td class="text-center" data-date="@(currentDay.ToString("yyyy-MM-dd"))">
+                                    <div class="checkbox-wrapper-31 mt-2">
+                                        <input data-shiftId="@shift.Id" data-date="@(currentDay.ToString("yyyy-MM-dd"))" type="checkbox" class="checkbox-register" @(exist != null ? $"{(exist.IsApproved != false ? "checked" : "")} data-regisid={exist.Id} {(exist.IsApproved != null ? "disabled" : "")}" : "") />
+                                        <svg viewBox="0 0 35.6 35.6">
+                                            <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                                            <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                                            <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                                        </svg>
+                                    </div>
+                                    @if(exist != null)
+                                    {
+                                        if (exist.IsForce)
+                                        {
+                                            <br />
+                                            <small class="text-center text-danger">Bắt buộc</small>
+                                        }
+                                        else if(exist.IsApproved == true)
+                                        {
+                                            <br />
+                                            <small class="text-center text-success">Đã chấp nhận</small>
+                                        }
+                                        else if(exist.IsApproved == false)
+                                        {
+                                            <br />
+                                            <small class="text-center text-danger">Bị từ chối</small>
+                                            <br />
+                                            <small class="text-center text-danger">@exist.ShiftConfirmations.LastOrDefault()?.RejectReason </small>
+                                        }
+                                        else
+                                        {
+                                            <br />
+                                            <small class="text-center text-dark">Chưa duyệt</small>
+                                        }
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+
+            <button type="button" id="btn-save" class="btn btn-primary">Gửi đăng ký</button>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $('#btn-save').on('click', function () {
+            var data = [];
+            var removeList = [];
+            $('input[type=checkbox]').each(function (index, element) {
+                var ob = {
+                    ShiftId: $(element).data('shiftid'),
+                    WorkDate: $(element).data('date'),
+                }
+                if ($(element).is(':checked')) {
+                    data.push(ob);
+                }else{
+                    let regisId = $(element).data('regisid');
+                    if (regisId) {
+                        ob.Id = regisId;
+                        removeList.push(ob);
+                    }
+                }
+            });
+            console.log(data);
+            console.log(removeList);
+            $.ajax({
+                url: '@Url.Action("Register", "Shift")',
+                method: 'post',
+                data: { data, removeList },
+                success: function (response) {
+                    if (response.success) {
+                        showToast("success", "Lưu thành công");
+                    } else {
+                        showAlert("error", "Có lỗi", response.error);
+                    }
+                },
+                error: function (error) {
+                    showAlert("error", "Có lỗi", error);
+                }
+            })
+        });
+    </script>
+}

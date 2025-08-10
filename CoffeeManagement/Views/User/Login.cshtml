@@ -1,0 +1,90 @@
+﻿@{
+    Layout = null;
+}
+@model CoffeeManagement.Models.User
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sedgwick+Ave&display=swap" rel="stylesheet">
+    <title>Đăng Nhập</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Sedgwick+Ave&display=swap" rel="stylesheet">
+    <!-- BOXICONS -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+</head>
+
+<body>
+    <main>
+
+
+        <div class="container">
+            <div class="left-section">
+                <div class="information">
+                    <img src="~/assets/images/coffee-logo.png" width="50" alt="Logo" class="logo">
+                    <h1>ĐĂNG NHẬP</h1>
+                    <h2>HỆ THỐNG QUẢN LÝ QUÁN CÀ PHÊ</h2>
+                </div>
+
+                <img src="assets/images/nen-login.png" alt="Building Illustration" class="building">
+            </div>
+            <div class="right-section">
+                <div class="login-box">
+                    <h3>ĐĂNG NHẬP</h3>
+                    <form action="@Url.Action("Login", "User")" method="post">
+                        <div class="input-group">
+                            <input asp-for="Username" placeholder="Tên đăng nhập" type="text" required />
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Username, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <input type="password" asp-for="Password" placeholder="Mật khẩu" required>
+                            <i class="fa-solid fa-eye" id="show-password"></i>
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Password, "", new { @class = "text-danger" })
+
+                        <div class="forgot-password">
+                            <a asp-action="ForgetPassword" asp-controller="User">Quên mật khẩu?</a>
+                        </div>
+                        <div style="color:red;margin-bottom:10px;">@ViewBag.Alert</div>
+                        <button type="submit" class="login-btn">Đăng nhập</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <footer>
+        </footer>
+
+    </main>
+
+
+
+    <script>
+
+        const showPassword = document.querySelector("#show-password");
+        const passwordField = document.querySelector("#Password");
+
+        showPassword.addEventListener("click", function () {
+            if (this.classList.contains("fa-eye")) {
+                this.classList.remove("fa-eye");
+                this.classList.add("fa-eye-slash");
+            } else {
+                this.classList.remove("fa-eye-slash");
+                this.classList.add("fa-eye");
+            }
+            const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+            passwordField.setAttribute("type", type);
+        });
+
+    </script>
+
+</body>
+
+</html>

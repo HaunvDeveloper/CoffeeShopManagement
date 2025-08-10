@@ -1,0 +1,57 @@
+#footer-info {
+    background-color: rgba(18, 72, 116, 1);
+    color: white;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.column{
+    display: flex;
+    flex-direction: column;
+}
+
+.row{
+    padding: 20px 40px;
+}
+
+#sign{
+    background-color: rgb(71, 72, 85);
+    color: rgba(255, 255, 255, 0.599);
+    text-align: right;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    padding-top: 4px;
+}
+#sign p{
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+#sign img{
+    margin-right: 10px;
+}
+
+.imghcmue{
+    width: 200px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+footer .row{
+    position: relative;
+}
+footer .toanha{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 300px;
+    z-index: 100;
+}
+.footer-line{
+    background-color: #CF373D;
+    position: absolute;
+    height: 20px;
+    bottom: 0;
+    width: 100%;
+}

@@ -1,0 +1,292 @@
+﻿  [
+    {
+      "EthnicID": "01",
+      "EthnicName": "Kinh",
+      "OldID": "01"
+    },
+    {
+      "EthnicID": "02",
+      "EthnicName": "Tày",
+      "OldID": "02"
+    },
+    {
+      "EthnicID": "03",
+      "EthnicName": "Thái",
+      "OldID": "03"
+    },
+  {
+    "EthnicID": "04",
+    "EthnicName": "Hoa",
+    "OldID": "04"
+  },
+  {
+    "EthnicID": "05",
+    "EthnicName": "Khơ-me",
+    "OldID": "05"
+  },
+  {
+    "EthnicID": "06",
+    "EthnicName": "Mường",
+    "OldID": "06"
+  },
+  {
+    "EthnicID": "07",
+    "EthnicName": "Nùng",
+    "OldID": "07"
+  },
+  {
+    "EthnicID": "08",
+    "EthnicName": "Hmông",
+    "OldID": "08"
+  },
+  {
+    "EthnicID": "09",
+    "EthnicName": "Dao",
+    "OldID": "09"
+  },
+  {
+    "EthnicID": "10",
+    "EthnicName": "Gia-rai",
+    "OldID": "10"
+  },
+  {
+    "EthnicID": "11",
+    "EthnicName": "Ngái",
+    "OldID": "11"
+  },
+  {
+    "EthnicID": "12",
+    "EthnicName": "Ê-đê",
+    "OldID": "12"
+  },
+  {
+    "EthnicID": "13",
+    "EthnicName": "Ba-na",
+    "OldID": "13"
+  },
+  {
+    "EthnicID": "14",
+    "EthnicName": "Xơ-đăng",
+    "OldID": "14"
+  },
+  {
+    "EthnicID": "15",
+    "EthnicName": "Sán Chay",
+    "OldID": "15"
+  },
+  {
+    "EthnicID": "16",
+    "EthnicName": "Cơ-ho",
+    "OldID": "16"
+  },
+  {
+    "EthnicID": "17",
+    "EthnicName": "Chăm",
+    "OldID": "17"
+  },
+  {
+    "EthnicID": "18",
+    "EthnicName": "Sán Dìu",
+    "OldID": "18"
+  },
+  {
+    "EthnicID": "19",
+    "EthnicName": "Hrê",
+    "OldID": "19"
+  },
+  {
+    "EthnicID": "20",
+    "EthnicName": "Mnông",
+    "OldID": "20"
+  },
+  {
+    "EthnicID": "21",
+    "EthnicName": "Ra-glai",
+    "OldID": "21"
+  },
+  {
+    "EthnicID": "22",
+    "EthnicName": "Xtiêng",
+    "OldID": "22"
+  },
+  {
+    "EthnicID": "23",
+    "EthnicName": "Bru-Vân Kiều",
+    "OldID": "23"
+  },
+  {
+    "EthnicID": "24",
+    "EthnicName": "Thổ",
+    "OldID": "24"
+  },
+  {
+    "EthnicID": "25",
+    "EthnicName": "Giáy",
+    "OldID": "25"
+  },
+  {
+    "EthnicID": "26",
+    "EthnicName": "Cơ-tu",
+    "OldID": "26"
+  },
+  {
+    "EthnicID": "27",
+    "EthnicName": "Gié-Triêng",
+    "OldID": "27"
+  },
+  {
+    "EthnicID": "28",
+    "EthnicName": "Mạ",
+    "OldID": "28"
+  },
+  {
+    "EthnicID": "29",
+    "EthnicName": "Khơ-mú",
+    "OldID": "29"
+  },
+  {
+    "EthnicID": "30",
+    "EthnicName": "Co",
+    "OldID": "30"
+  },
+  {
+    "EthnicID": "31",
+    "EthnicName": "Ta-ôi",
+    "OldID": "31"
+  },
+  {
+    "EthnicID": "32",
+    "EthnicName": "Chơ-ro",
+    "OldID": "32"
+  },
+  {
+    "EthnicID": "33",
+    "EthnicName": "Kháng",
+    "OldID": "33"
+  },
+  {
+    "EthnicID": "34",
+    "EthnicName": "Xinh-mun",
+    "OldID": "34"
+  },
+  {
+    "EthnicID": "35",
+    "EthnicName": "Hà Nhì",
+    "OldID": "35"
+  },
+  {
+    "EthnicID": "36",
+    "EthnicName": "Chu-ru",
+    "OldID": "36"
+  },
+  {
+    "EthnicID": "37",
+    "EthnicName": "Lào",
+    "OldID": "37"
+  },
+  {
+    "EthnicID": "38",
+    "EthnicName": "La Chi",
+    "OldID": "38"
+  },
+  {
+    "EthnicID": "39",
+    "EthnicName": "La Ha",
+    "OldID": "39"
+  },
+  {
+    "EthnicID": "40",
+    "EthnicName": "Phù Lá",
+    "OldID": "40"
+  },
+  {
+    "EthnicID": "41",
+    "EthnicName": "La Hủ",
+    "OldID": "41"
+  },
+  {
+    "EthnicID": "42",
+    "EthnicName": "Lự",
+    "OldID": "42"
+  },
+  {
+    "EthnicID": "43",
+    "EthnicName": "Lô Lô",
+    "OldID": "43"
+  },
+  {
+    "EthnicID": "44",
+    "EthnicName": "Chứt",
+    "OldID": "44"
+  },
+  {
+    "EthnicID": "45",
+    "EthnicName": "Mảng",
+    "OldID": "45"
+  },
+  {
+    "EthnicID": "46",
+    "EthnicName": "Pà Thẻn",
+    "OldID": "46"
+  },
+  {
+    "EthnicID": "47",
+    "EthnicName": "Cơ Lao",
+    "OldID": "47"
+  },
+  {
+    "EthnicID": "48",
+    "EthnicName": "Cống",
+    "OldID": "48"
+  },
+  {
+    "EthnicID": "49",
+    "EthnicName": "Bố Y",
+    "OldID": "49"
+  },
+  {
+    "EthnicID": "50",
+    "EthnicName": "Si La",
+    "OldID": "50"
+  },
+  {
+    "EthnicID": "51",
+    "EthnicName": "Pu Péo",
+    "OldID": "51"
+  },
+  {
+    "EthnicID": "52",
+    "EthnicName": "Brâu",
+    "OldID": "52"
+  },
+  {
+    "EthnicID": "53",
+    "EthnicName": "Ơ Đu",
+    "OldID": "53"
+  },
+  {
+    "EthnicID": "54",
+    "EthnicName": "Rơ-măm",
+    "OldID": "54"
+  },
+  {
+    "EthnicID": "55",
+    "EthnicName": "Người nước ngoài",
+    "OldID": "55"
+  },
+  {
+    "EthnicID": "997",
+    "EthnicName": "Khác",
+    "OldID": "997"
+  },
+  {
+    "EthnicID": "998",
+    "EthnicName": "Campuchia",
+    "OldID": "998"
+  },
+  {
+    "EthnicID": "999",
+    "EthnicName": "Mang",
+    "OldID": "999"
+  }
+]

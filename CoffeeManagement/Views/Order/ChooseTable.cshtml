@@ -1,0 +1,555 @@
+﻿@model IEnumerable<CoffeeManagement.ViewModels.TableViewModel>
+
+@{
+    ViewData["Title"] = "Choose Table";
+    var paymentMethod = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "cash", Text = "Tiền mặt" },
+        new SelectListItem { Value = "card", Text = "Thẻ" },
+        new SelectListItem { Value = "mobile", Text = "Chuyển khoản" }
+    };
+    var dictionary = new Dictionary<string, string>
+    {
+        { "cash", "Tiền mặt" },
+        { "card", "Thẻ" },
+        { "mobile", "Chuyển khoản" },
+        { "", "Chưa thanh toán" } // Default case for null or empty payment method}
+    };
+}
+
+@section Links {
+<style>
+    .table-card{
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 130px;
+    }
+
+    .table-card:hover {
+    transform: translateY(-5px);
+    }
+
+    .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    }
+
+    .card-text {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    }
+
+    .input-group-text {
+    background-color: #f8f9fa;
+    }
+
+
+
+    .add-table-card {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    }
+</style>
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4" style="font-size: 30px; font-weight: bold; color: #dc3545;">CHỌN BÀN</h2>
+
+    <!-- Search Bar and Takeaway Button -->
+    <div class="mb-4 d-flex align-items-center">
+        <div class="input-group me-3">
+            <input type="text" id="tableSearch" class="form-control" placeholder="Tìm kiếm bàn theo số hoặc mô tả..." />
+            <span class="input-group-text">
+                <i class="bi bi-search"></i>
+            </span>
+        </div>
+        <a href="@Url.Action("Order", "Order", new { tableId = 0 })" class="btn btn-primary text-nowrap">
+            <i class="bi bi-box-arrow-right me-2"></i>Bán Mang Đi
+        </a>
+    </div>
+
+    <!-- Table List -->
+    <div class="row g-4" id="tableList">
+        @foreach (var table in Model)
+        {
+            var cardClass = table.Status switch
+            {
+                "Available" => "bg-secondary text-white",
+                "Occupied" => "bg-success text-white",
+                "Reserved" => "bg-warning text-dark",
+                _ => "bg-secondary text-white"
+            };
+            var cardStatusName = table.Status switch
+            {
+                "Available" => "TRỐNG",
+                "Occupied" => "ĐANG DÙNG",
+                "Reserved" => "ĐÃ ĐẶT TRƯỚC",
+                _ => "KHÔNG XÁC ĐỊNH"
+            };
+            <div class="col-md-4 col-lg-3 table-card position-relative" data-table-no="@table.TableNo" data-description="@table.Description" >
+                <a href="@Url.Action("CheckingOrder", "Order", new { tableId = table.Id })" class="text-decoration-none">
+                    <div class="card shadow-sm h-100 @cardClass">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Bàn @table.TableNo</h5>
+                            <p class="card-text">Trạng thái: @cardStatusName</p>
+                            <p class="card-text">Sức chứa: @table.Capacity người</p>
+                            @if (table.Status == "Occupied" && table.FirstGetIn.HasValue)
+                            {
+                                <p class="card-text timer-text">Thời gian: <span class="timer" data-id="@table.Id" @(table.Status == "Occupied" && table.FirstGetIn.HasValue ? $"data-first-get-in={table.FirstGetIn?.ToString("o")}" : "")></span></p>
+                                <div class="show-amount d-flex mt-3 mb-0 justify-content-between">
+                                    <h6><i class="bi bi-people-fill"></i>  @table.TotalItem món</h6>
+                                    <h5 class="text-warning" style="font-weight:900;">@table.TotalAmount.ToString("C", new System.Globalization.CultureInfo("vi-VN"))</h5>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </a>
+                <div class="dropdown detail-icon position-absolute" style="top: 5%; right: 5%; z-index:100">
+                    <i class="bi bi-three-dots-vertical" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.5rem;"></i>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        @if (table.Status == "Available")
+                        {
+                            @* <li>
+                                <a class="dropdown-item" href="#" data-table-id="@table.Id" data-table-no="@table.TableNo">
+                                    <i class="bi bi-calendar-event me-2"></i>Đặt bàn
+                                </a>
+                            </li> *@
+                            <li>
+                                <a class="dropdown-item text-danger delete-table" href="#" data-table-id="@table.Id" data-table-no="@table.TableNo">
+                                    <i class="bi bi-trash me-2"></i>Xóa bàn
+                                </a>
+                            </li>
+                        }
+                        else if (table.Status == "Reserved")
+                        {@* 
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" data-table-id="@table.Id" data-table-no="@table.TableNo">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Hủy đặt trước
+                                </a>
+                            </li> *@
+                        }
+                        else
+                        {
+                            if(!table.IsPaid)
+                            {
+                                <li>
+                                    <a class="btn-payment-table dropdown-item text-success" href="#" data-table-id="@table.Id" data-table-no="@table.TableNo" data-amount="@table.RemainingAmount.ToString("C", new System.Globalization.CultureInfo("vi-VN"))" data-bs-toggle="modal" data-bs-target="#choosePaymentMethodModal">
+                                        <i class="bi bi-cash-coin me-2"></i>Thanh toán tất cả
+                                    </a>
+                                </li>
+                            }
+                            
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transferTableModal" data-table-id="@table.Id" data-table-no="@table.TableNo">
+                                    <i class="bi bi-arrow-left-right me-2"></i>Chuyển bàn
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger empty-table" href="#" data-table-id="@table.Id" data-table-no="@table.TableNo">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Đã rời đi
+                                </a>
+                            </li>
+                        }
+                        
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        }
+        <!-- Add New Table Card -->
+        <div class="col-md-4 col-lg-3 table-card">
+            <div class="card shadow-sm h-100 bg-light add-table-card" data-bs-toggle="modal" data-bs-target="#addTableModal">
+                <div class="card-body text-center d-flex align-items-center">
+                    <i class="bi bi-plus-circle" style="font-size: 3rem; color: #dc3545;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Table Modal -->
+<div class="modal fade" id="addTableModal" tabindex="-1" aria-labelledby="addTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTableModalLabel">Thêm Bàn Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTableForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="tableNo" class="form-label">Table Number</label>
+                        <input type="text" class="form-control" id="tableNo" placeholder="Enter table number" required />
+                        <div class="invalid-feedback">Vui lòng nhập số bàn.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="capacity" class="form-label">Capacity</label>
+                        <input type="number" class="form-control" id="capacity" min="1" placeholder="Enter capacity" required />
+                        <div class="invalid-feedback">Vui lòng nhập sức chứa (số dương).</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="description" placeholder="Enter description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="isActive" class="form-label">Active Status</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="isActive" checked />
+                            <label class="form-check-label" for="isActive">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="saveTableBtn">Lưu Bàn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transfer Table Modal -->
+<div class="modal fade" id="transferTableModal" tabindex="-1" aria-labelledby="transferTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transferTableModalLabel">Chuyển bàn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="transferTableForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="transferTableId" />
+                    <div class="mb-3">
+                        <label for="transferTableNo" class="form-label">Bàn hiện tại</label>
+                        <input type="text" class="form-control" id="transferTableNo" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTableSelect" class="form-label">Chọn bàn mới</label>
+                        <select class="form-select" id="newTableSelect" required>
+                            <option value="">Chọn bàn trống</option>
+                            @foreach (var availableTable in Model.Where(t => t.IsActive))
+                            {
+                                <option value="@availableTable.Id">Bàn @availableTable.TableNo (Sức chứa: @availableTable.Capacity)</option>
+                            }
+                        </select>
+                        <div class="invalid-feedback">Vui lòng chọn bàn mới.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="saveTransferTableBtn">Chuyển bàn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Payment Modal -->
+<div class="modal fade" id="choosePaymentMethodModal" tabindex="-1" aria-labelledby="choosePaymentMethodModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="choosePaymentMethodModalLabel">Phương thức thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="choosePaymentMethodForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="tableId" value="" />
+                    <input type="hidden" id="totalAllTable" value="" />
+                    <div class="alert alert-success">
+                        <h5 class="titlePaymentMethod">ĐƠN HÀNG BÀN</h5>
+                        <h6>Tổng tiền thanh toán còn lại: <b class="totalAmountByTable"></b></h6>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTableSelect" class="form-label">Chọn phương thức thanh toán</label>
+                        <select class="form-select" id="newTableSelect" required asp-items="paymentMethod">
+                        </select>
+                        <div class="invalid-feedback">Vui lòng chọn bàn mới.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btn-payment-save">Thanh toán</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Real-time timer for Occupied tables
+            function updateTimers() {
+                $('.table-card .timer').each(function() {
+                    const str = $(this).data('first-get-in');
+                    const firstGetIn = new Date(str);
+                    const tableId = $(this).data('id');
+                    if (!isNaN(firstGetIn)) {
+                        const now = new Date();
+                        const diff = Math.floor((now - firstGetIn) / 1000); // Seconds
+                        const hours = Math.floor(diff / 3600);
+                        const minutes = Math.floor((diff % 3600) / 60);
+                        const seconds = diff % 60;
+                        const timeString = `${hours.toString().padStart(2, '0')}g ${minutes.toString().padStart(2, '0')}p ${seconds.toString().padStart(2, '0')}s`;
+                        $(this).text(timeString);
+                    } else {
+                        $(this).text('N/A');
+                    }
+                });
+            }
+
+            // Start timer
+            updateTimers();
+            setInterval(updateTimers, 1000);
+
+            // Search Functionality
+            $('#tableSearch').on('input', function () {
+                const searchText = $(this).val().toLowerCase();
+                $('.table-card').each(function () {
+                    const tableNo = $(this).attr('data-table-no')?.toLowerCase() || '';
+                    const description = $(this).data('description') ? $(this).data('description').toLowerCase() : '';
+                    if (tableNo.includes(searchText) || description.includes(searchText)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Save New Table
+            $('#saveTableBtn').on('click', function () {
+                const tableNo = $('#tableNo').val().trim();
+                const status = 'Available';
+                const capacity = $('#capacity').val();
+                const description = $('#description').val().trim();
+                const isActive = $('#isActive').is(':checked');
+                const tableForm = $('#addTableForm')[0];
+
+                // Validate form
+                if (!tableNo || !status || !capacity || capacity <= 0) {
+                    if (!tableNo) $('#tableNo').addClass('is-invalid');
+                    else $('#tableNo').removeClass('is-invalid');
+                    if (!capacity || capacity <= 0) $('#capacity').addClass('is-invalid');
+                    else $('#capacity').removeClass('is-invalid');
+                    tableForm.classList.add('was-validated');
+                    return;
+                } else {
+                    $('#tableNo').removeClass('is-invalid');
+                    $('#capacity').removeClass('is-invalid');
+                }
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Table")',
+                    method: 'POST',
+                    data: {
+                        TableNo: tableNo,
+                        Status: status,
+                        Capacity: capacity,
+                        Description: description || null,
+                        IsActive: isActive
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Add new table to the list
+                            const cardClass = response.status === 'Available' ? 'bg-secondary text-white' :
+                                response.status === 'Occupied' ? 'bg-success text-white' :
+                                    response.status === 'Reserved' ? 'bg-warning text-dark' : 'bg-secondary text-white';
+
+                            var newCard = `
+                                <div class="col-md-4 col-lg-3 table-card position-relative" data-table-no="${response.tableNo}" data-description="${response.description || ''}">
+                                    <a href="@(Url.Action("Order", "Order"))?tableId= ${response.id}" class="text-decoration-none">
+                                        <div class="card shadow-sm h-100 ${cardClass}">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Bàn ${response.tableNo}</h5>
+                                                <p class="text">Trạng thái: ${response.status}</p>
+                                                <p class="text">Sức chứa: ${response.capacity} người</p>
+                                                ${response.description ? `<p class="text">Mô tả: ${response.description}</p>` : ''}
+                                                <p class="text">Còn hoạt động: ${response.isActive ? 'Có' : 'Không'}</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown detail-icon position-absolute" style="top: 5%; right: 5%; z-index:100">
+                                        <i class="bi bi-three-dots-vertical" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.5rem;"></i>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" data-table-id="${response.id}" data-table-no="${response.tableNo}">
+                                                            <i class="bi bi-calendar-event me-2"></i>Đặt bàn
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger delete-table" href="#" data-table-id="${response.id}" data-table-no="${response.tableNo}">
+                                                            <i class="bi bi-trash me-2"></i>Xóa bàn
+                                                        </a>
+                                                    </li>
+                                        </ul>
+                                    </div>
+                                </div>`;
+                            $('#tableList').prepend(newCard); // Add new card to the top
+                            $('#addTableModal').modal('hide');
+                            $('#tableNo').val('');
+                            $('#status').val('');
+                            $('#capacity').val('');
+                            $('#description').val('');
+                            $('#isActive').prop('checked', true);
+                            showToast('success', 'Table created successfully!');
+                        } else {
+                            alert('Error: ' + (response.message || 'Failed to create table.'));
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while creating the table: ' + xhr.statusText);
+                    }
+                });
+            });
+
+            // Delete Table
+            $(document).on('click', '.delete-table', async function (e) {
+                e.preventDefault();
+                const tableId = $(this).data('table-id');
+                const tableNo = $(this).data('table-no');
+
+                let confirm = await confirmAction();
+                if (confirm) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Table")' + '/' + tableId,
+                        method: 'POST',
+                        success: function (response) {
+                            if (response.success) {
+                                $(`.table-card[data-table-no="${tableNo}"]`).remove();
+                                showToast('success', 'Table deleted successfully!');
+                            } else {
+                                alert('Error: ' + (response.message || 'Failed to delete table.'));
+                            }
+                        },
+                        error: function (xhr) {
+                            alert('An error occurred while deleting the table: ' + xhr.statusText);
+                        }
+                    });
+                }
+            });
+
+            // Populate Transfer Table Modal
+            $('#transferTableModal').on('show.bs.modal', function (event) {
+                const button = $(event.relatedTarget);
+                const tableId = button.data('table-id');
+                const tableNo = button.data('table-no');
+
+                const modal = $(this);
+                modal.find('#transferTableId').val(tableId);
+                modal.find('#transferTableNo').val(tableNo);
+            });
+
+            // Save Transfer Table
+            $('#saveTransferTableBtn').on('click', function () {
+                const tableId = $('#transferTableId').val();
+                const newTableId = $('#newTableSelect').val();
+                const tableForm = $('#transferTableForm')[0];
+
+                // Validate form
+                if (!newTableId) {
+                    $('#newTableSelect').addClass('is-invalid');
+                    tableForm.classList.add('was-validated');
+                    return;
+                } else {
+                    $('#newTableSelect').removeClass('is-invalid');
+                }
+
+                $.ajax({
+                    url: '@Url.Action("Transfer", "Table")',
+                    method: 'POST',
+                    data: {
+                        currentTableId: tableId,
+                        newTableId: newTableId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.reload(); // Reload the page to reflect changes
+                        } else {
+                            alert('Error: ' + (response.message || 'Failed to transfer table.'));
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while transferring the table: ' + xhr.statusText);
+                    }
+                });
+            });
+
+            // Empty Table
+            $(document).on('click', '.empty-table', async function (e) {
+                if (!await confirmAction('Bạn có chắc chắn muốn làm bàn này trống không?', 'warning', '')) {
+                    return;
+                }
+                e.preventDefault();
+                const tableId = $(this).data('table-id');
+                const tableNo = $(this).data('table-no');
+                $.ajax({
+                    url: '@Url.Action("LeaveTable", "Order")',
+                    data: {tableId: tableId},
+                    method: 'POST',
+                    success: function (response) {
+                        if (response.success) {
+                            // $(`.table-card[data-table-no="${tableNo}"]`).find('.card').removeClass('bg-success bg-warning').addClass('bg-secondary');
+                            // $(`.table-card[data-table-no="${tableNo}"]`).find('.timer-text').remove();
+                            // $(`.table-card[data-table-no="${tableNo}"] .card-text:eq(0)`).text('Trạng thái: TRỐNG');
+                            // $(`.table-card[data-table-no="${tableNo}"] .show-amount`).remove();
+                            // showToast('success', 'Table emptied successfully!');
+                            window.location.reload();   
+                        } else {
+                            alert('Error: ' + (response.message || 'Failed to empty table.'));
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while emptying the table: ' + xhr.statusText);
+                    }
+                });
+            });
+
+            $('.btn-payment-table').on('click', function (){
+                var modal = $('#choosePaymentMethodModal');
+                $(modal).find('#tableId').val($(this).data('table-id'));
+
+                $(modal).find('.totalAmountByTable').text($(this).data('amount'));
+                $(modal).find('.titlePaymentMethod').text('ĐƠN HÀNG BÀN ' + $(this).data('table-no'));
+            });
+            $('#btn-payment-save').on('click', function(){
+                const paymentMethod = $('#newTableSelect').val();
+                const tableId = $('#tableId').val();
+                
+                    $.ajax({
+                        url: '@Url.Action("QuickPaymentByTable", "Order")',
+                        type: 'POST',
+                        data: {
+                            paymentMethod: paymentMethod,
+                            tableId: tableId,
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                showToast('success', response.message);
+                                window.location.reload();
+                            } else {
+                                alert('Xảy ra lỗi khi thanh toán. Vui lòng thử lại.');
+                            }
+                        },
+                        error: function () {
+                            alert('Xảy ra lỗi khi thanh toán. Vui lòng thử lại.');
+                        }
+                    });
+                
+            });
+        
+        });
+    </script>
+}

@@ -1,0 +1,54 @@
+﻿@model IEnumerable<CoffeeManagement.Models.WorkSchedule>
+@{
+    int stt = 1;
+    DateTime startDate = new DateTime((DateOnly)ViewBag.StartDate, TimeOnly.MinValue);
+    DateTime endDate = new DateTime((DateOnly)ViewBag.EndDate, TimeOnly.MaxValue);
+    var listShift = (List<Shift>)ViewBag.Shifts;
+
+    string[] dayNames = new string[] { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+}
+<table class="table table-bordered">
+    <thead class="table-primary">
+        <tr class="table-primary">
+            <th scope="col">Ca</th>
+            @for (int i = 0; i < 7; i++)
+            {
+                DateTime currentDay = startDate.AddDays(i);
+                <th scope="col">
+                    @dayNames[(int)currentDay.DayOfWeek] <br />
+                    <small>@currentDay.ToString("dd/MM/yyyy")</small>
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var shift in listShift)
+        {
+            <tr data-id="@shift.Id">
+                <th scope="row" class="text-lg-start">
+                    <b class="text-dark text-lg-start">@shift.Name</b><br />
+                    <small class="text-dark text-lg-start">@shift.StartTime.ToShortTimeString() - @shift.EndTime.ToShortTimeString()</small>
+                </th>
+                @for (int i = 0; i < 7; i++)
+                {
+                    DateTime currentDay = startDate.AddDays(i);
+
+                    var exist = Model.FirstOrDefault(x => x.WorkDate == DateOnly.FromDateTime(currentDay) && x.ShiftId == shift.Id);
+
+                    <td class="text-center" data-date="@(currentDay.ToString("yyyy-MM-dd"))">
+                        <div class="checkbox-wrapper-31 mt-2">
+                            <input data-shiftId="@shift.Id" data-date="@(currentDay.ToString("yyyy-MM-dd"))" type="checkbox" class="checkbox-register" @(exist != null ? $"checked data-regisid={exist.Id}" :"") disabled/>
+                            <svg viewBox="0 0 35.6 35.6">
+                                <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                                <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                                <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                            </svg>
+                        </div>
+                    </td>
+                }
+            </tr>
+        }
+
+
+    </tbody>
+</table>

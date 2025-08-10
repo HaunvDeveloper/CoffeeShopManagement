@@ -1,0 +1,69 @@
+﻿
+@{
+    DateTime nextMonday = DateTime.Parse(ViewBag.NextMonday);
+    DateTime nextSunday = DateTime.Parse(ViewBag.NextSunday);
+    var listShift = (List<Shift>)ViewBag.Shifts;
+    var registrations = (List<WorkDayListViewModel>?)ViewBag.Registrations;
+    string[] dayNames = new string[] { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+}
+
+
+
+<table class="table table-bordered">
+    <thead class="table-primary">
+        <tr class="table-primary">
+            <th scope="col">Ca</th>
+            @for (int i = 0; i < 7; i++)
+            {
+                DateTime currentDay = nextMonday.AddDays(i);
+                <th scope="col">
+                    @dayNames[(int)currentDay.DayOfWeek] <br />
+                    <small>@currentDay.ToString("dd/MM/yyyy")</small>
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var shift in listShift)
+        {
+            <tr data-id="@shift.Id">
+                <th scope="row" class="text-lg-start">
+                    <b class="text-dark text-lg-start text-no-wrap">@shift.Name</b><br />
+                    <small class="text-dark text-lg-start text-no-wrap">@shift.StartTime.ToShortTimeString() - @shift.EndTime.ToShortTimeString()</small>
+                </th>
+                @for (int i = 0; i < 7; i++)
+                {
+                    DateTime currentDay = nextMonday.AddDays(i);
+                    var dateKey = currentDay.ToString("yyyy-MM-dd");
+                    var dateOnly = new DateOnly(currentDay.Year, currentDay.Month, currentDay.Day);
+
+                    var registered = registrations?
+                        .Where(x => x.WorkDate == dateOnly && x.ShiftId == shift.Id)
+                        .ToList();
+
+
+                    var employeeApprovedList = registered?.Where(x => x.IsApproved == true).Select(x => x.Employee);
+                    var employeeDisApproved = registered?.Where(x => x.IsApproved == null).Select(x => x.Employee).Count();
+                    string styleTd = employeeApprovedList?.Count() > 0 ? "table-light" : "table-secondary";
+
+                    <td class="text-center cell-shift @styleTd" data-shiftid="@shift.Id" data-date="@dateKey">
+                        <button type="button" class="btn btn-outline-success btn-sm btn-show-modal" data-toggle="modal" data-target="#employeeModal">
+                            +
+                        </button>
+                        @if (employeeApprovedList != null && employeeApprovedList.Any())
+                        {
+
+
+                            @foreach (var employee in employeeApprovedList)
+                            {
+                                <br />
+                                <button class="btn-sm text-no-wrap btn btn-light-success mt-1">@employee.FullName</button>
+                            }
+
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

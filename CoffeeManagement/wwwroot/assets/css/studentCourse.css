@@ -1,0 +1,54 @@
+﻿.app-main {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.semester-header td{
+    background-color: #CBE8FF;
+    border: 1px solid;
+}
+
+.table-container {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+    .table-container table {
+        width: 100%;
+        border: 1px solid;
+    }
+
+    .table-container th, .table-container td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .table-container th {
+        background-color: #124874;
+        color: white;
+    }
+
+    .table-container tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table-container .semester-header {
+        background-color: #f1f1f1;
+        font-weight: bold;
+    }
+
+/*.btn-detail {
+    background-color: #007BFF;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+}*/
+
+    .btn-detail:hover {
+        background-color: #0056b3;
+    }

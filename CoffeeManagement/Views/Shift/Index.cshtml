@@ -1,0 +1,25 @@
+﻿@{
+
+}
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+    <link rel="stylesheet" href="~/assets/css/checkbox.css">
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+}
+
+
+<div class="container">
+    <div class="table-container m-4">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">QUẢN LÝ CA TRỰC</h4>
+        <div class=" d-flex justify-content-center gap-4">
+            <a asp-action="Index" asp-controller="Schedule" class="btn btn-primary btn-lg">Xem lịch trực</a>
+            <a asp-action="ListShift" class="btn btn-warning btn-lg">Các ca trực</a>
+            <a asp-action="Checking" class="btn btn-info btn-lg">Duyệt ca trực</a>
+        </div>
+    </div>
+</div>

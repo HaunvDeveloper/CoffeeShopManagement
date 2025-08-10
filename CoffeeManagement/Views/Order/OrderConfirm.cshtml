@@ -1,0 +1,119 @@
+﻿@model CoffeeManagement.Models.Order
+
+@{
+    ViewData["Title"] = "Order Confirmation";
+    var products = ViewBag.Products as IEnumerable<CoffeeManagement.Models.Product>;
+}
+
+@section Links {
+    <style>
+        .invoice-card {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #dee2e6;
+        }
+
+        .invoice-header {
+            background-color: #dc3545;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .invoice-body {
+            padding: 1.5rem;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .btn-export {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+        }
+    </style>
+}
+
+<div class="container mt-5">
+    @if (Model.IsPaid)
+    {
+        <!-- Invoice Preview -->
+        <div class="card invoice-card shadow-sm">
+            <div class="invoice-header">
+                <h2 style="font-size: 24px; font-weight: bold;">HÓA ĐƠN BÁN HÀNG</h2>
+                <p>Mã đơn hàng: @Model.BillNo</p>
+            </div>
+            <div class="invoice-body">
+                <h5>Thông tin đơn hàng</h5>
+                <p><strong>Số đơn hàng:</strong> @Model.SaleNo</p>
+                <p><strong>Ngày:</strong> @Model.SaleDate.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><strong>Khách hàng:</strong> @Model.CustomerName</p>
+                <p><strong>Bàn:</strong> @(Model.TableId == 0 ? "Bán Mang Đi" : $"Bàn {ViewBag.TableNo}")</p>
+                <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+                <p><strong>Tổng tiền:</strong> @(Model.TotalAmount.ToString("N0")) VND</p>
+
+                <h5 class="mt-4">Chi tiết đơn hàng</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.OrderDetails)
+                        {
+                            var product = products?.FirstOrDefault(p => p.Id == detail.ProductId);
+                            <tr>
+                                <td>@(product?.Name ?? "Unknown Product")</td>
+                                <td>@detail.Quantity</td>
+                                <td>@detail.UnitPrice.ToString("N0") VND</td>
+                                <td>@((detail.Quantity * detail.UnitPrice).ToString("N0")) VND</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Tổng cộng:</th>
+                            <td>@Model.TotalAmount.ToString("N0") VND</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="text-center mt-4">
+                    <a href="@Url.Action("ChooseTable", "Order")" class="btn btn-secondary btn-export ms-2">
+                        <i class="bi bi-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <a href="@Url.Action("ExportInvoice", "Order", new { orderId = Model.Id })" class="btn btn-primary btn-export">
+                        <i class="bi bi-printer me-2"></i>Xuất Hóa Đơn
+                    </a>
+                    
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Success Message -->
+        <div class="text-center">
+            <h2 class="mb-4" style="font-size: 30px; font-weight: bold; color: #28a745;">Lưu đơn hàng thành công!</h2>
+            <p>Mã đơn hàng: @Model.BillNo</p>
+            <p>Số đơn hàng: @Model.SaleNo</p>
+            <div class="mt-4">
+                <a href="@Url.Action("ChooseTable", "Order")" class="btn btn-secondary me-2">
+                    <i class="bi bi-arrow-left me-2"></i>Quay lại chọn bàn
+                </a>
+                <a href="@Url.Action("Edit", "Order", new { id = Model.Id })" class="btn btn-primary">
+                    <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa đơn hàng
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+}

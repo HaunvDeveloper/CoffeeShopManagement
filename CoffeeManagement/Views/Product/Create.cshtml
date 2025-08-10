@@ -1,0 +1,305 @@
+﻿@model CoffeeManagement.Models.Product
+
+@{
+    ViewData["Title"] = "Tạo Sản phẩm";
+}
+
+<div class="container">
+    <div class="table-container m-4">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">THÊM SẢN PHẨM</h4>
+
+        <form id="createProductForm" asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <div class="card shadow-sm p-4">
+                <div class="row g-3">
+                    <div class="col-lg-8">
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label">Category</label>
+                            <div class="input-group">
+                                <select asp-for="CategoryId" id="CategoryId" class="form-select" asp-items="ViewBag.CategoryList" required>
+                                    <option value="">Select a category</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                    Add Category
+                                </button>
+                            </div>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Code -->
+                        <div class="mb-3">
+                            <label asp-for="Code" class="form-label">Product Code</label>
+                            <input asp-for="Code" class="form-control" placeholder="Product code will be generate" required disabled />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Product Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter product name" required />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Unit -->
+                        <div class="mb-3">
+                            <label asp-for="Unit" class="form-label">Unit</label>
+                            <input asp-for="Unit" class="form-control" placeholder="e.g., kg, unit, liter" />
+                            <span asp-validation-for="Unit" class="text-danger"></span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label">Price</label>
+                            <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" placeholder="Enter price" required />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <!-- Stock Quantity -->
+                        <div class="mb-3 d-none">
+                            <label asp-for="StockQuantity" class="form-label">Stock Quantity</label>
+                            <input asp-for="StockQuantity" class="form-control" type="number" min="0" value="0" placeholder="Enter stock quantity" required />
+                            <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Vat" class="form-label">VAT</label>
+                            <input asp-for="Vat" class="form-control" type="number" min="0" max="100" value="0" placeholder="Enter VAT (%)" required />
+                            <span asp-validation-for="Vat" class="text-danger"></span>
+                        </div>
+
+                        
+                        <!-- Origin -->
+                        <div class="mb-3">
+                            <label asp-for="Origin" class="form-label">Origin</label>
+                            <input asp-for="Origin" class="form-control" placeholder="e.g., Vietnam, USA" />
+                            <span asp-validation-for="Origin" class="text-danger"></span>
+                        </div>
+
+                        <!-- IsActive -->
+                        <div class="mb-3">
+                            <label asp-for="IsActive" class="form-label">Active Status</label>
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                                <label asp-for="IsActive" class="form-check-label">Active</label>
+                            </div>
+                            <span asp-validation-for="IsActive" class="text-danger"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter product description"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Image Upload with Preview (Right Column) -->
+                    <div class="col-lg-4">
+                        <div class="card h-100 p-3 bg-light">
+                            <h5 class="mb-3">Product Image</h5>
+                            <label class="form-label">Upload Image</label>
+                            <input type="file" name="ImageFile" id="imageFile" class="form-control mb-3" accept="image/*" />
+                            <div class="text-center">
+                                <img id="imagePreview" src="#" alt="Image Preview" style="max-width: 100%; max-height: 300px; display: none;" class="img-thumbnail" />
+                                <p id="noImageText" class="text-muted mt-2">No image selected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-4 d-flex justify-content-end">
+                    <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn-submit btn btn-primary">Create Product</button>
+                    <div class="loader" style="display: none"></div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Add Category Modal -->
+        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCategoryForm" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="categoryCode" class="form-label">Category Code</label>
+                                <input type="text" class="form-control" id="categoryCode" placeholder="Enter category code" required />
+                                <div class="invalid-feedback">Please enter a category code.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoryName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="categoryName" placeholder="Enter category name" required />
+                                <div class="invalid-feedback">Please enter a category name.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoryDescription" class="form-label">Description (Optional)</label>
+                                <textarea class="form-control" id="categoryDescription" placeholder="Enter category description" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Bootstrap 5 client-side validation -->
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- Image Preview, Category Creation, and Form Submit Script -->
+    <script>
+        $(document).ready(function () {
+            // Image Preview
+            $('#imageFile').on('change', function (event) {
+                const file = event.target.files[0];
+                const preview = $('#imagePreview');
+                const noImageText = $('#noImageText');
+
+                if (file) {
+                    if (!file.type.match('image.*')) {
+                        alert('Please select a valid image file.');
+                        this.value = '';
+                        preview.hide();
+                        noImageText.show();
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Image file is too large. Maximum size is 5MB.');
+                        this.value = '';
+                        preview.hide();
+                        noImageText.show();
+                        return;
+                    }
+
+                    preview.attr('src', URL.createObjectURL(file));
+                    preview.show();
+                    noImageText.hide();
+                } else {
+                    preview.hide();
+                    preview.attr('src', '#');
+                    noImageText.show();
+                }
+            });
+
+            // Category Change to Generate Code
+            $('#CategoryId').on('change', function (event) {
+                let id = $(this).val();
+                if (id) {
+                    $.ajax({
+                        url: '@Url.Action("GetCode", "Product")',
+                        method: 'POST',
+                        data: { categoryId: id },
+                        success: function (data) {
+                            if (data.success) {
+                                $('#Code').val(data.code);
+                            } else {
+                                alert('Error: ' + (data.message || 'Failed to get product code.'));
+                            }
+                        },
+                        error: function (xhr) {
+                            alert('An error occurred while getting product code: ' + xhr.statusText);
+                        }
+                    });
+                }
+            });
+
+            // Save New Category
+            $('#saveCategoryBtn').on('click', function () {
+                const categoryCode = $('#categoryCode').val().trim();
+                const categoryName = $('#categoryName').val().trim();
+                const categoryDescription = $('#categoryDescription').val().trim();
+                const categoryForm = $('#addCategoryForm')[0];
+
+                // Validate form
+                if (!categoryCode || !categoryName) {
+                    if (!categoryCode) $('#categoryCode').addClass('is-invalid');
+                    else $('#categoryCode').removeClass('is-invalid');
+                    if (!categoryName) $('#categoryName').addClass('is-invalid');
+                    else $('#categoryName').removeClass('is-invalid');
+                    categoryForm.classList.add('was-validated');
+                    return;
+                } else {
+                    $('#categoryCode').removeClass('is-invalid');
+                    $('#categoryName').removeClass('is-invalid');
+                }
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Category")',
+                    method: 'POST',
+                    data: {
+                        Code: categoryCode,
+                        Name: categoryName,
+                        Description: categoryDescription || null
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Add new category to select list
+                            const newOption = $('<option>', {
+                                value: response.categoryId,
+                                text: response.categoryName
+                            });
+                            $('#CategoryId').append(newOption);
+                            $('#CategoryId').val(response.categoryId); // Select the new category
+                            $('#addCategoryModal').modal('hide'); // Close modal
+                            $('#categoryCode').val(''); // Clear inputs
+                            $('#categoryName').val('');
+                            $('#categoryDescription').val('');
+                            $('#CategoryId').trigger('change'); // Trigger code generation
+                            showToast("success", "Category created successfully!", 2000);
+                        } else {
+                            alert('Error: ' + (response.message || 'Failed to create category.'));
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while creating the category: ' + xhr.statusText);
+                    }
+                });
+            });
+
+            // Form Submit with AJAX
+            $('#createProductForm').submit(function (e) {
+                e.preventDefault();
+
+
+                let formData = new FormData(this);
+                formData.append('Code', $('#Code').val());
+
+                $('.btn-submit').hide();
+                $('.loader').show();
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Product")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            showAlertRedirect("success", response.message, "", response.redirect);
+                        } else {
+                            alert('Error: ' + (response.message || 'Failed to create product.'));
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while creating the product: ' + xhr.statusText);
+                    },
+                    finally: function(){
+                        $('.btn-submit').show();
+                        $('.loader').hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

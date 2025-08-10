@@ -1,0 +1,172 @@
+﻿@{
+    ViewData["Title"] = "Danh sách bán hàng";
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+}
+
+<div class="container">
+    <div class="table-container m-4 table-responsive">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">DANH SÁCH BÁN HÀNG</h4>
+        <div class="d-flex justify-content-between mb-3 align-items-center flex-wrap gap-2">
+            <a asp-action="Order" asp-controller="Order" class="btn btn-add-course">+ Thêm bán hàng</a>
+        </div>
+
+        <!-- Table to display employee data using DataTable -->
+        <table id="tableData" class="table table-striped">
+            <thead class="table-primary">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Số BH</th>
+                    <th>Số Hóa đơn</th>
+                    <th>Ngày bán</th>
+                    <th>Khách hàng</th>
+                    <th>Nhân viên</th>
+                    <th>Tổng tiền</th>
+                    <th>Vị trí</th>
+                    <th>Trạng thái</th>
+                    <th>Phương thức</th>
+                    <th>Đang dùng</th>
+                    <th>Ghi chú</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded dynamically by DataTable -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Bạn có chắc chắn muốn xóa phiếu mua sau không?</strong></p>
+                <ul id="purchaseInfo" class="list-unstyled mb-0"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+        var table = $('#tableData').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": true,  // Enable the default search box of DataTable
+            "ajax": {
+                "url": '@Url.Action("_GetList", "Order")', // AJAX call to _GetList action
+                "data": function (d) {
+                    d.keyword = $('input[type="search"]').val(); // Pass the search keyword to the server
+                },
+                "type": "POST",
+                "dataSrc": function (json) {
+                    return json.data; // Đảm bảo dữ liệu trả về theo đúng định dạng DataTable yêu cầu
+                }
+            },
+            "pageLength": 25, // Default page size
+            "lengthMenu": [10, 25, 50, 100], // Options for page size
+            "columns": [
+                { "data": "id", "orderable":false },
+                { "data": "saleNo", "orderable":false },
+                { "data": "billNo", "orderable":false},
+                { "data": "saleDate", "orderable":false },
+                { "data": "customerName", "orderable":false },
+                { "data": "employeeName", "orderable":false },
+                { 
+                    "data": "totalAmount",
+                    "render": function (data, type, row) {
+                        return data ? data.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '';
+                    }, "orderable":false
+                },
+                { "data": "position", "orderable":false },
+                { "data": "status", "orderable":false },
+                { "data": "paymentMethod", "orderable":false },
+                { "data": "isUsing", "orderable":false },
+                { "data": "description", "orderable":false },
+                {
+                    "data": "id",
+                    "render": function (data, type, row) {
+                        // Create the "Edit" button with dynamic link
+                        return `
+                        <div class="d-flex gap-1">
+                           <a href="/Order/Edit/` + data + `" class="btn btn-outline-primary"><i class="bi bi-pencil-fill"></i></a>
+                           <button onclick="deleteRow(`+ data + `)" class="btn-delete btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                        </div>
+                                            `;
+                    }, "orderable":false
+                }
+            ]
+        });
+
+        let selectedId = null;
+
+        async function deleteRow(id) {
+            if (!id) return;
+
+            // Gọi API để lấy thông tin ngắn gọn
+            $.post('@Url.Action("GetShortInfor", "Order")', { id: id }, function (response) {
+                if (response.success) {
+                    selectedId = id;
+                    const data = response.data;
+                    const infoHtml = `
+                                <li><strong>ID:</strong> ${data.Id}</li>
+                                <li><strong>Số BH:</strong> ${data.SaleNo}</li>
+                                <li><strong>Khách hàng:</strong> ${data.CustomerName ?? 'Không có'}</li>
+                                <li><strong>Nhân viên:</strong> ${data.EmployeeSaleName}</li>
+                                <li><strong>Ngày bán:</strong> ${data.SaleDateStr}</li>
+                                <li><strong>Tổng tiền:</strong> ${data.TotalAmountStr ?? '0'}</li>
+                                <li><strong>Ghi chú:</strong> ${data.Description ?? ''}</li>
+                            `;
+                    $('#purchaseInfo').html(infoHtml);
+                    var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                    modal.show();
+                } else {
+                    showAlert("error", "Không tìm thấy", response.error);
+                }
+            });
+        }
+
+        // Khi người dùng nhấn xác nhận xóa
+        $('#confirmDeleteBtn').on('click', function () {
+            if (!selectedId) return;
+
+            $.ajax({
+                url: '@Url.Action("Delete", "Order")',
+                method: 'post',
+                data: { id: selectedId },
+                success: function (response) {
+                    if (response.success) {
+                        $('#deleteConfirmModal').modal('hide');
+                        showAlert("success", "Thành công", response.message);
+                        table.ajax.reload(null, false);
+                    } else {
+                        showAlert("error", "Lỗi", response.message);
+                    }
+                },
+                error: function (error) {
+                    showAlert("error", "Lỗi", error.statusText);
+                }
+            });
+        });
+
+
+
+
+
+    </script>
+}

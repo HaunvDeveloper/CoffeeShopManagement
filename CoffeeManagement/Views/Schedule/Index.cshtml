@@ -1,0 +1,162 @@
+﻿@{
+    ViewData["Title"] = "Thời khoá biểu";
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+    <link rel="stylesheet" href="~/assets/css/checkbox.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .container-shadow {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            width: 230px !important;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="table-container m-4 ">
+        <div class=" m-3">
+            <h3 class="text-danger text-center">THỜI KHÓA BIỂU</h3>
+            <div class="d-flex align-items-center mt-1 flex-wrap justify-content-between mx-4   ">
+                <div>
+                    Chọn tuần:
+                    <input id="week" type="week" class="form-control-sm" />
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <button id="previousWeek" class=" btn btn-primary">
+                        <i class="bi bi-skip-start-fill"></i>
+                    </button>
+                    <button id="currentWeek" class=" btn btn-primary">
+                        <i class="bi bi-table"></i> Hiện tại
+                    </button>
+                    <button id="nextWeek" class=" btn btn-primary">
+                        <i class="bi bi-skip-end-fill"></i>
+                    </button>
+                </div>
+
+                <div class="mt-2">Từ ngày <b id="fromDateDisplay"></b> đến ngày <b id="toDateDisplay"></b></div>
+
+            </div>
+        </div>
+        <div class="cd-schedule loading">
+        </div>
+    </div>
+</div>
+@*  *@
+
+@section Scripts
+{
+    <script>
+        function getCurrentWeek() {
+            var currentDate = new Date();
+            var startDate = new Date(currentDate.getFullYear(), 0, 1);
+            var days = Math.ceil((currentDate - startDate) / (24 * 60 * 60 * 1000));
+            var weekNumber = Math.ceil((days + 1) / 7);
+
+            var year = currentDate.getFullYear();
+            var weekString = year + '-W' + String(weekNumber).padStart(2, '0');
+            return weekString;
+        }
+        function getMondayAndSundayFromWeek(weekValue) {
+            var year = weekValue.substring(0, 4);
+            var week = weekValue.substring(6, 8);
+
+            var startDate = new Date(year, 0, 2 + (week - 1) * 7);
+            var dayOfWeek = startDate.getDay();
+            var monday = new Date(startDate);
+            monday.setDate(startDate.getDate() - dayOfWeek + 2);
+            var sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            var mondayFormatted = monday.toISOString().split('T')[0];
+            var sundayFormatted = sunday.toISOString().split('T')[0];
+
+            return { monday: mondayFormatted, sunday: sundayFormatted };
+        }
+        function loadData() {
+            $('.cd-schedule').html(`<div class="text-info d-flex justify-content-center align-items-center gap-2" style="padding: 10px;border: 1px dotted;border-radius: 5px;">
+                                        <div class="loader"></div> <h5>Đang tải dữ liệu.........</h5>
+                                    </div>`);
+            var weekValue = $('#week').val();
+
+            if (weekValue) {
+                var { monday, sunday } = getMondayAndSundayFromWeek(weekValue);
+                $('#fromDateDisplay').text(monday);
+                $('#toDateDisplay').text(sunday);
+                $.ajax({
+                            url: '@Url.Action("_GetSchedules", "Schedule")',
+                            type: 'GET',
+                            data: {
+                        startDate: monday,
+                        endDate: sunday
+                            },
+                            success: function (data) {
+                                // Xử lý dữ liệu trả về
+                                $('.cd-schedule').html(data);
+                            },
+                            error: function () {
+                                alert('Không thể lấy dữ liệu lịch trình.');
+                            }
+                        });
+            } else {
+                $('.cd-schedule').text('Vui lòng chọn tuần');
+            }
+        }
+
+
+        $('#previousWeek').on('click', function () {
+            var currentWeekValue = $('#week').val();
+            var currentWeekNumber = parseInt(currentWeekValue.substring(6, 8));
+            var year = currentWeekValue.substring(0, 4);
+            var previousWeekNumber = currentWeekNumber - 1;
+
+            if (previousWeekNumber < 1) {
+                previousWeekNumber = 52; // Giới hạn lại tuần nếu vượt qua tuần 1
+                year = (parseInt(year) - 1).toString(); // Giảm năm khi quay lại tuần 52
+            }
+
+            var previousWeekValue = year + '-W' + String(previousWeekNumber).padStart(2, '0');
+            $('#week').val(previousWeekValue);
+            $('#week').trigger('change');
+        });
+
+        $('#currentWeek').on('click', function () {
+            $('#week').val(getCurrentWeek());
+            $('#week').trigger('change');
+        });
+
+        $('#nextWeek').on('click', function () {
+            var currentWeekValue = $('#week').val();
+            var currentWeekNumber = parseInt(currentWeekValue.substring(6, 8));
+            var year = currentWeekValue.substring(0, 4);
+            var nextWeekNumber = currentWeekNumber + 1;
+
+            if (nextWeekNumber > 52) {
+                nextWeekNumber = 1; // Giới hạn lại tuần nếu vượt quá tuần 52
+                year = (parseInt(year) + 1).toString(); // Tăng năm khi vượt qua tuần 52
+            }
+
+            var nextWeekValue = year + '-W' + String(nextWeekNumber).padStart(2, '0');
+            $('#week').val(nextWeekValue);
+            $('#week').trigger('change');
+        });
+
+        $(document).ready(function () {
+            $('#week').val(getCurrentWeek());
+            loadData();
+        });
+
+        $('#week').on('change', function (event) {
+            loadData();
+        });
+
+    </script>
+
+    
+}

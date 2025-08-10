@@ -1,0 +1,89 @@
+﻿.app-main {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.info-section {
+    width: 88%;
+    border: 1px solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.attendance-section {
+    width: 90%;
+}
+
+.info-section, .attendance-section {
+    margin: 20px auto;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+    .info-section h5{
+        text-align: left;
+        margin-bottom: 20px;
+        color: red;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .info-section span {
+        font-size: 20px;
+        color: #000;
+    }
+
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-left: 80px;
+    }
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .info-table td {
+        padding: 3px;
+        text-align: left;
+        align-items: center;
+    }
+
+    .attendance-table th, .attendance-table td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .attendance-table th {
+        background-color: #124874;
+        color: white;
+    }
+
+.info-table td:first-child, .info-table td:nth-child(3) {
+    font-weight: bold;
+}
+
+.attendance-table td:first-child {
+    font-weight: bold;
+}
+
+.status-present {
+    background-color: #B9FFE0;
+}
+
+.status-late {
+    background-color: #FAFBBD;
+}
+
+.status-absent {
+    background-color: #FFD2D2;
+}
+
+.default-status {
+    background-color: #CBE8FF;
+}

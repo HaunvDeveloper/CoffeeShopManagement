@@ -1,0 +1,92 @@
+﻿[
+  {
+    "ReligionID": "00",
+    "ReligionName": "Không",
+    "OldID": "00"
+  },
+  {
+    "ReligionID": "01",
+    "ReligionName": "Phật giáo",
+    "OldID": "01"
+  },
+  {
+    "ReligionID": "02",
+    "ReligionName": "Công giáo",
+    "OldID": "02"
+  },
+  {
+    "ReligionID": "03",
+    "ReligionName": "Phật giáo Hoà Hảo",
+    "OldID": "03"
+  },
+  {
+    "ReligionID": "04",
+    "ReligionName": "Hồi giáo",
+    "OldID": "04"
+  },
+  {
+    "ReligionID": "05",
+    "ReligionName": "Cao Đài",
+    "OldID": "05"
+  },
+  {
+    "ReligionID": "06",
+    "ReligionName": "Minh sư đạo",
+    "OldID": "06"
+  },
+  {
+    "ReligionID": "07",
+    "ReligionName": "Minh Lý đạo",
+    "OldID": "07"
+  },
+  {
+    "ReligionID": "08",
+    "ReligionName": "Tin Lành",
+    "OldID": "08"
+  },
+  {
+    "ReligionID": "09",
+    "ReligionName": "Tịnh độ cư sĩ Phật hội Việt Nam",
+    "OldID": "09"
+  },
+  {
+    "ReligionID": "10",
+    "ReligionName": "Đạo Tứ ấn hiếu nghĩa",
+    "OldID": "10"
+  },
+  {
+    "ReligionID": "11",
+    "ReligionName": "Bửu sơn Kỳ hương",
+    "OldID": "11"
+  },
+  {
+    "ReligionID": "12",
+    "ReligionName": "Ba Ha'i",
+    "OldID": "12"
+  },
+  {
+    "ReligionID": "13",
+    "ReligionName": "Tôn giáo khác",
+    "OldID": "13"
+  },
+  {
+    "ReligionID": "20",
+    "ReligionName": "Thiên Chúa",
+    "OldID": "20"
+  },
+  {
+    "ReligionID": "21",
+    "ReligionName": "Lương",
+    "OldID": "21"
+  },
+  {
+    "ReligionID": "22",
+    "ReligionName": "Bà Ni",
+    "OldID": "22"
+  },
+  {
+    "ReligionID": "23",
+    "ReligionName": "Bà la môn",
+    "OldID": "23"
+  }
+]

@@ -1,0 +1,134 @@
+﻿.main-wrapper {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    background-color: white;
+    border: 1px solid #000;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position:relative;
+}
+.content-wrapper.blur {
+    filter: blur(5px);
+    pointer-events: none; /* Prevent interactions */
+}
+
+.horizontal-layout {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px auto;
+}
+
+.header-bar {
+    background-color: #124874;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+}
+
+.header-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.content-wrapper {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.camera-frame {
+    position: relative;
+    margin: 0 auto;
+    background-color: #d9d9d9;
+    border-radius: 50%;
+    width: 290px;
+    height: 290px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px 10px rgba(0, 0, 0, 0.1); /* Viền mờ */
+    overflow: hidden;
+}
+
+#camera {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.camera-placeholder {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    color: #0056b3;
+}
+    .camera-placeholder i {
+        font-size: 170px;
+        color: #124874;
+    }
+    .camera-placeholder:hover {
+        background-color: #f0f0f0;
+    }
+
+.instructions {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.instruction-left-box{
+    margin-left: 15px;
+}
+
+.instruction-right-box{
+    margin-right: 15px;
+}
+
+.instruction-left-box, .instruction-right-box {
+    background-color: #CBE8FF;
+    color: #000;
+    padding: 10px;
+    border-radius: 50px;
+    text-align: center;
+    font-weight: bold;
+    width: 30%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-button {
+    background-color: #124874;
+    width: 140px;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 20px auto;
+}
+
+    .confirm-button:hover {
+        background-color: #004494;
+    }
+
+.camera-frame {
+    box-shadow: 0 0 15px 5px rgb(223 31 31 / 80%);
+}
+.camera-frame.centered {
+    box-shadow: 0 0 15px 5px rgba(0, 255, 0, 0.8); /* Green border when isCentered is true */
+}

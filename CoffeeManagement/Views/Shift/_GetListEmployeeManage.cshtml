@@ -1,0 +1,55 @@
+﻿@model List<CoffeeManagement.ViewModels.EmployeeShiftCheckingViewModel>
+@{
+
+}
+<div class="container">
+    <!-- Thẻ tìm kiếm -->
+
+    <div class="d-flex align-items-center gap-2">
+        <div class="checkbox-wrapper-31">
+            <input type="checkbox" id="select-all" />
+            <svg viewBox="0 0 35.6 35.6">
+                <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+            </svg>
+        </div>
+        <label for="select-all">Chọn tất cả</label>
+    </div>
+
+    <form>
+        <div class="list-group mt-4" id="employeeList">
+            @foreach (var employee in Model)
+            {
+                <label for="employee-@employee.Id" class="list-group-item d-flex align-items-center gap-3 employee-item" data-name="@employee.FullName" data-id="@employee.Id">
+                    <div class="checkbox-wrapper-31">
+                        <input type="checkbox" id="employee-@employee.Id" name="employees" data-id="@employee.Id" @(employee.IsWork ? "checked" : "") />
+                        <svg viewBox="0 0 35.6 35.6">
+                            <circle class="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                            <circle class="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                            <polyline class="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                        </svg>
+                    </div>
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between">
+                            <b>@employee.FullName</b>
+                            @if (employee.IsRegistered)
+                            {
+                                <b>@employee.StatusRegist</b>
+                            }
+                        </div>
+                        <div>
+                            <small>@employee.PhoneNo</small> |
+                            <small>@employee.PositionName</small> |
+                            <small>@employee.Gender</small>
+                        </div>
+                        
+                    </div>
+                </label>
+            }
+        </div>
+    </form>
+</div>
+
+
+

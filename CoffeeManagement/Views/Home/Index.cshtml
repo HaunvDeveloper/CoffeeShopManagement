@@ -1,0 +1,412 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Dashboard</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::App Content Header-->
+
+<div class="app-content">
+    <div class="container-fluid">
+        <!-- Info Boxes -->
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary shadow-sm">
+                        <i class="bi bi-receipt text-light"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Tổng Đơn Hàng</span>
+                        <span id="totalOrder" class="info-box-number">
+                            
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-danger shadow-sm">
+                        <i class="bi bi-box-seam-fill text-light"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Tổng số sản phẩm</span>
+                        <span id="totalProduct" class="info-box-number"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-success shadow-sm">
+                        <i class="bi bi-cash-stack text-light"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Doanh Thu</span>
+                        <span id="totalRevenueAll" class="info-box-number"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-warning shadow-sm">
+                        <i class="bi bi-people"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Số Khách Hàng</span>
+                        <span id="totalCustomer" class="info-box-number"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+        <!-- Charts Row -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">Báo Cáo Doanh Thu Theo Tháng</h5>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+                                <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
+                                <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
+                            </button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-tool dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="bi bi-wrench"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" role="menu">
+                                    <a href="#" class="dropdown-item">Tải Lại</a>
+                                    <a href="#" class="dropdown-item">Xuất Báo Cáo</a>
+                                    <a class="dropdown-divider"></a>
+                                    <a href="#" class="dropdown-item">Cài Đặt</a>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-tool" data-lte-toggle="card-remove">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p class="text-center">
+                                    <strong>Doanh Thu: 01/2025 - 06/2025</strong>
+                                </p>
+                                <div id="sales-chart" style="height: 180px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-4 col-6">
+                                <div class="text-center border-end">
+                                    <span class="text-success"><i class="bi bi-caret-up-fill"></i> 15%</span>
+                                    <h5 id="totalRevenue" class="fw-bold mb-0"></h5>
+                                    <span class="text-uppercase">TỔNG DOANH THU</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <div class="text-center border-end">
+                                    <span class="text-info"><i class="bi bi-caret-left-fill"></i> 0%</span>
+                                    <h5 id="totalCost" class="fw-bold mb-0"></h5>
+                                    <span class="text-uppercase">TỔNG CHI PHÍ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <div class="text-center">
+                                    <span class="text-success"><i class="bi bi-caret-up-fill"></i> 20%</span>
+                                    <h5 id="totalProfit" class="fw-bold mb-0"></h5>
+                                    <span class="text-uppercase">TỔNG LỢI NHUẬN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">So Sánh Doanh Thu & Chi Phí</h3>
+                            <a href="javascript:void(0);" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Xem Báo Cáo</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <p class="d-flex flex-column">
+                                <span id="todayRevenue" class="fw-bold fs-5"></span>
+                                <span>Doanh Thu Hôm Nay</span>
+                            </p>
+                            <p class="ms-auto d-flex flex-column text-end">
+                                <span id="efficiency" class="text-success"><i class="bi bi-arrow-up"></i> </span>
+                                <span class="text-secondary">So với tháng trước</span>
+                            </p>
+                        </div>
+                        <div class="position-relative mb-4"><div id="sales-chart2" style="height: 200px;"></div></div>
+                        <div class="d-flex flex-row justify-content-end">
+                            <span class="me-2"><i class="bi bi-square-fill" style="color: #28a745;"></i> Doanh Thu</span>
+                            <span class="me-2"><i class="bi bi-square-fill" style="color: #dc3545;"></i> Chi Phí</span>
+                            <span><i class="bi bi-square-fill" style="color: #ffc107;"></i> Lợi Nhuận</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header border-0">
+                        <div class="d-flex justify-content-between">
+                            <h3 class="card-title">Khách Hàng Truy Cập</h3>
+                            <a href="javascript:void(0);" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Xem Báo Cáo</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <p class="d-flex flex-column">
+                                <span id="totalCustomerAccess" class="fw-bold fs-5">450</span>
+                                <span>Khách Hàng Hôm Nay</span>
+                            </p>
+                            <p class="ms-auto d-flex flex-column text-end">
+                                <span id="efficiencyCustomer" class="text-success"><i class="bi bi-arrow-up"></i> 8%</span>
+                                <span class="text-secondary">So với tuần trước</span>
+                            </p>
+                        </div>
+                        <div class="position-relative mb-4"><div id="visitors-chart" style="height: 200px;"></div></div>
+                        <div class="d-flex flex-row justify-content-end">
+                            <span class="me-2"><i class="bi bi-square-fill" style="color: #0d6efd;"></i> Số Khách Cao</span>
+                            <span><i class="bi bi-square-fill" style="color: #adb5bd;"></i> Số Khách Thấp</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Doanh Thu Theo Sản Phẩm</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+                                <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
+                                <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-lte-toggle="card-remove">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12"><div id="pie-chart" style="height: 300px;"></div></div>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    
+    <script>
+        $(document).ready(function () {
+            // Data Header
+            $.ajax({
+                url: '/Dashboard/GetHeaderData',
+                method: 'GET',
+                success: function (response) {
+                    $('#totalOrder').text(response.totalOrders);
+                    $('#totalProduct').text(response.totalProducts);
+                    $('#totalRevenueAll').text(response.totalRevenue.toLocaleString('vi-VN') + ' VND');
+                    $('#totalCustomer').text(response.totalCustomers);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading header data:', error);
+                }
+            });
+
+
+            
+
+            // Monthly Sales Chart
+            $.ajax({
+                url: '/Dashboard/GetMonthlySalesData',
+                method: 'GET',
+                success: function (response) {
+                    var data = response;
+                    // Gán dữ liệu tiền tệ
+                    $('#totalRevenue').text(data.totalRevenue);
+                    $('#totalCost').text(data.totalCost);
+                    $('#totalProfit').text(data.totalProfit);
+
+                    // Hàm xử lý biểu tượng và màu
+                    function getIndicatorHtml(value) {
+                        let icon = '';
+                        let cls = '';
+
+                        if (value > 0) {
+                            icon = '<i class="bi bi-caret-up-fill"></i>';
+                            cls = 'text-success';
+                        } else if (value < 0) {
+                            icon = '<i class="bi bi-caret-down-fill"></i>';
+                            cls = 'text-danger';
+                        } else {
+                            icon = '<i class="bi bi-caret-left-fill"></i>';
+                            cls = 'text-secondary';
+                        }
+
+                        return `<span class="${cls}">${icon} ${Math.abs(value).toFixed(1)}%</span>`;
+                    }
+
+                    // Cập nhật hiệu suất phần trăm với biểu tượng
+                    $('#totalRevenue').prev().html(getIndicatorHtml(data.revenueEfficiency));
+                    $('#totalCost').prev().html(getIndicatorHtml(data.costEfficiency));
+                    $('#totalProfit').prev().html(getIndicatorHtml(data.profitEfficiency));
+                    const salesChart = new ApexCharts(document.querySelector('#sales-chart'), {
+                        series: [
+                            { name: 'Doanh thu (Order)', data: response.revenue },
+                            { name: 'Chi phí (Purchase)', data: response.cost },
+                        ],
+                        chart: { height: 180, type: 'area', toolbar: { show: false } },
+                        legend: { show: true, position: 'top' },
+                        colors: ['#28a745', '#dc3545'],
+                        dataLabels: { enabled: false },
+                        stroke: { curve: 'smooth' },
+                        xaxis: { type: 'category', categories: response.categories, labels: { rotate: -45, style: { fontSize: '12px' } } },
+                        yaxis: { labels: { formatter: (value) => value.toLocaleString('vi-VN') + ' VND' } },
+                        tooltip: { y: { formatter: (value) => value.toLocaleString('vi-VN') + ' VND' } },
+                    });
+                    salesChart.render();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading sales data:', error);
+                }
+            });
+
+            // Pie Chart
+            $.ajax({
+                url: '/Dashboard/GetPieChartData',
+                method: 'GET',
+                success: function (response) {
+                    const pieChart = new ApexCharts(document.querySelector('#pie-chart'), {
+                        series: response.series,
+                        chart: { type: 'donut', height: 300 },
+                        labels: response.labels,
+                        dataLabels: { enabled: false },
+                        colors: ['#0d6efd', '#20c997', '#ffc107', '#d63384', '#6f42c1', '#ccc'],
+                        legend: { position: 'bottom' },
+                        responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' } } }],
+                    });
+                    pieChart.render();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading pie chart data:', error);
+                }
+            });
+
+                    // Visitors Chart
+            $.ajax({
+                url: '/Dashboard/GetVisitorsData',
+                method: 'GET',
+                success: function (response) {
+                    // Render biểu đồ
+                    const visitorsChart = new ApexCharts(document.querySelector('#visitors-chart'), {
+                        series: [
+                            { name: 'Số khách cao', data: response.highData },
+                            { name: 'Số khách thấp', data: response.lowData },
+                        ],
+                        chart: { height: 200, type: 'line', toolbar: { show: false } },
+                        colors: ['#0d6efd', '#adb5bd'],
+                        stroke: { curve: 'smooth' },
+                        grid: { borderColor: '#e7e7e7', row: { colors: ['#f3f3f3', 'transparent'], opacity: 0.5 } },
+                        markers: { size: 1 },
+                        xaxis: { categories: response.categories },
+                        yaxis: { labels: { formatter: (value) => value.toLocaleString('vi-VN') } },
+                    });
+                    visitorsChart.render();
+
+                    // Cập nhật khách hôm nay
+                    $('#totalCustomerAccess').text(response.todayVisitors.toLocaleString('vi-VN'));
+
+                    // Xử lý hiệu suất
+                    let efficiency = response.visitorsEfficiency;
+                    let icon = '', cls = '';
+
+                    if (efficiency > 0) {
+                        icon = '<i class="bi bi-arrow-up"></i>';
+                        cls = 'text-success';
+                    } else if (efficiency < 0) {
+                        icon = '<i class="bi bi-arrow-down"></i>';
+                        cls = 'text-danger';
+                    } else {
+                        icon = '<i class="bi bi-arrow-left"></i>';
+                        cls = 'text-secondary';
+                    }
+
+                    $('#efficiencyCustomer')
+                        .removeClass('text-success text-danger text-secondary')
+                        .addClass(cls)
+                        .html(`${icon} ${Math.abs(efficiency).toFixed(1)}%`);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading visitors data:', error);
+                }
+            });
+
+
+            // Bar Chart
+            $.ajax({
+                url: '/Dashboard/GetBarChartData',
+                method: 'GET',
+                success: function (response) {
+
+
+                    $('#todayRevenue').text(response.todayRevenue);
+                    $('#efficiency').html(
+                        `${parseFloat(response.efficiency) >= 0 ? '<i class="bi bi-arrow-up"></i>': ' <i class="bi bi-arrow-down"></i>'} ${response.efficiency}`
+                    );
+                    if(response.efficiency < 0){
+                        $('#efficiency').toggleClass('text-success text-danger');
+                    }
+
+                    const salesChart2 = new ApexCharts(document.querySelector('#sales-chart2'), {
+                        series: [
+                            { name: 'Doanh thu', data: response.revenue },
+                            { name: 'Chi phí', data: response.cost },
+                            { name: 'Lợi nhuận ròng', data: response.profit },
+                        ],
+                        chart: { type: 'bar', height: 200 },
+                        plotOptions: { bar: { horizontal: false, columnWidth: '55%', endingShape: 'rounded' } },
+                        legend: { show: true, position: 'top' },
+                        colors: ['#28a745', '#dc3545', '#ffc107'],
+                        dataLabels: { enabled: false },
+                        stroke: { show: true, width: 2, colors: ['transparent'] },
+                        xaxis: { categories: response.categories },
+                        yaxis: { labels: { formatter: (value) => value.toLocaleString('vi-VN') + ' VND' } },
+                        fill: { opacity: 1 },
+                        tooltip: { y: { formatter: (value) => value.toLocaleString('vi-VN') + ' VND' } },
+                    });
+                    salesChart2.render();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading bar chart data:', error);
+                }
+            });
+        });
+    </script>
+}

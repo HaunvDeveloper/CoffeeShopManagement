@@ -1,0 +1,139 @@
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+}
+
+<div class="container">
+    <div class="table-container m-4 table-responsive">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">DANH SÁCH SẢN PHẨM</h4>
+        <div class="d-flex justify-content-between mb-3 align-items-center flex-wrap gap-2">
+            <a asp-action="Create" asp-controller="Product" class="btn btn-add-course">+ Thêm sản phẩm</a>
+        </div>
+
+        <!-- Table to display employee data using DataTable -->
+        <table id="tableData" class="table table-striped">
+            <thead class="table-primary">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn vị</th>
+                    <th>Ngày tạo</th>
+                    <th>Giá</th>
+                    <th>Thuế (%)</th>
+                    <th>Hình ảnh</th>
+                    <th>Loại</th>
+                    <th>Nguồn gốc</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded dynamically by DataTable -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+                var table = $('#tableData').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": true,
+            "ajax": {
+                "url": '@Url.Action("_GetList", "Product")',
+                "data": function (d) {
+                    d.keyword = $('input[type="search"]').val();
+                },
+                "type": "POST",
+                "dataSrc": function (json) {
+                    return json.data;
+                }
+            },
+            "pageLength": 25,
+            "lengthMenu": [10, 25, 50, 100],
+            "columns": [
+                { "data": "Id" },
+                { "data": "Code" },
+                { "data": "Name" },
+                { "data": "Unit" },
+                { "data": "CreatedDateStr" },
+                {
+                    "data": "Price",
+                    "render": function (data, type, row) {
+                        // Định dạng giá tiền (nếu cần)
+                        return data ? data.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '';
+                    }
+                },
+                {
+                    "data": "Vat",
+                    "render": function (data, type, row) {
+                        // Định dạng giá tiền (nếu cần)
+                        return data + '%';
+                    }
+                },
+                {
+                    "data": "ImageBinary",
+                    "render": function (data, type, row) {
+                        if (data) {
+                            return `<img src="data:image/jpeg;base64,${data}" alt="Product Image" style="width: 100px; height: auto;" />`;
+                        } else {
+                            return `<span>No Image</span>`;
+                        }
+                    }
+                },
+                { "data": "CategoryName" },
+                { "data": "Origin" },
+                {
+                    "data": "IsActive",
+                    "render": function (data, type, row) {
+                        // Hiển thị trạng thái Active/Inactive
+                        return data ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
+                    }
+                },
+                {
+                    "data": "Id",
+                    
+                    "render": function (data, type, row) {
+                        return `
+                            <a href="/Product/Edit/${data}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-fill"></i></a>
+                            <button onclick="deleteRow(${data})" class="btn-delete btn btn-danger btn-sm"><i class="bi bi-trash-fill"></i></button>
+                        `;
+                    }
+                }
+            ]
+        });
+
+        async function deleteRow(id) {
+            if (id) {
+                let confirmed = await confirmAction();
+                if (confirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Product")',
+                        method: 'post',
+                        data: { id },
+                        success: function (response) {
+                            if (response.success) {
+                                table.ajax.reload(null, false);
+                            } else {
+                                showAlert("error", "Có lỗi", response.error);
+                            }
+                        },
+                        error: function (error) {
+                            showAlert("error", "Có lỗi", error);
+                        }
+                    });
+                }
+            }
+        };
+
+
+
+
+    </script>
+}

@@ -1,0 +1,281 @@
+﻿@{
+    ViewBag.Title = "Quản lý ca trực";
+    
+}
+
+@section Links {
+    <link rel="stylesheet" href="~/assets/css/course.css">
+    <link rel="stylesheet" href="~/assets/css/checkbox.css">
+
+    <style>
+        .btn-sm {
+            width: 120px;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="table-container m-4 ">
+        <h4 class="text-center mb-4 mt-2 text-danger" style="font-size:30px;font-weight:bold;">QUẢN LÝ CA TRỰC</h4>
+        
+        <div class="d-flex align-items-center mt-1 flex-wrap justify-content-between mx-4   ">
+            <div>
+                Chọn tuần: 
+                <input id="week" type="week" class="form-control-sm" />
+            </div>
+            <div class="d-flex gap-2 mt-2">
+                <button id="previousWeek" class=" btn btn-primary">
+                    <i class="bi bi-skip-start-fill"></i>
+                </button>
+                <button id="currentWeek" class=" btn btn-primary">
+                    <i class="bi bi-table"></i> Hiện tại
+                </button>
+                <button id="nextWeek" class=" btn btn-primary">
+                    <i class="bi bi-skip-end-fill"></i>
+                </button>
+            </div>
+            
+
+            <div class="mt-2">Từ ngày <b id="fromDateDisplay"></b> đến ngày <b id="toDateDisplay"></b></div>
+
+            
+        </div>
+        
+
+        <div id="checking-list" class="table-responsive mt-2">
+            <div class="text-info d-flex justify-content-center align-items-center gap-2" style="padding: 10px;border: 1px dotted;border-radius: 5px;">
+                <div class="loader"></div> <h5>Đang tải dữ liệu.........</h5>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal modal-lg fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex flex-wrap justify-content-between">
+                <h5 class="modal-title" id="employeeModalLabel">Xếp lịch cho ca</h5>
+                <input class="form-control w-25" id="searchInput" placeholder="Tìm kiếm nhân viên..." type="text"/>
+            </div>
+            <div class="modal-body" id="employeeList">
+                <!-- Danh sách nhân viên sẽ được hiển thị ở đây -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-save-checking" class="btn btn-primary btn-close-modal" data-dismiss="modal">Lưu</button>
+                <button type="button" class="btn btn-secondary btn-close-modal" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function getCurrentWeek() {
+            var currentDate = new Date();
+            var startDate = new Date(currentDate.getFullYear(), 0, 1);
+            var days = Math.ceil((currentDate - startDate) / (24 * 60 * 60 * 1000));
+            var weekNumber = Math.ceil((days + 1) / 7);
+
+            var year = currentDate.getFullYear();
+            var weekString = year + '-W' + String(weekNumber).padStart(2, '0');
+            return weekString;
+        }
+        function getMondayAndSundayFromWeek(weekValue) {
+            var year = weekValue.substring(0, 4);
+            var week = weekValue.substring(6, 8);
+
+            var startDate = new Date(year, 0, 2 + (week - 1) * 7);
+            var dayOfWeek = startDate.getDay();
+            var monday = new Date(startDate);
+            monday.setDate(startDate.getDate() - dayOfWeek + 2); 
+            var sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6); 
+            var mondayFormatted = monday.toISOString().split('T')[0];
+            var sundayFormatted = sunday.toISOString().split('T')[0];
+
+            return { monday: mondayFormatted, sunday: sundayFormatted };
+        }
+        function loadData() {
+            $('#checking-list').html(`<div class="text-info d-flex justify-content-center align-items-center gap-2" style="padding: 10px;border: 1px dotted;border-radius: 5px;">
+                                <div class="loader"></div> <h5>Đang tải dữ liệu.........</h5>
+                            </div>`);
+            var weekValue = $('#week').val();
+
+            if (weekValue) {
+                var { monday, sunday } = getMondayAndSundayFromWeek(weekValue);
+                $('#fromDateDisplay').text(monday);
+                $('#toDateDisplay').text(sunday);
+                $.ajax({
+                    url: '@Url.Action("_GetListManage", "Shift")',
+                    method: 'GET',
+                    data: { monday: monday, sunday: sunday },  
+                    success: function (response) {
+                        $('#checking-list').html(response);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        $('#checking-list').text('Có lỗi');
+                    }
+                });
+            } else {
+                $('#checking-list').text('Vui lòng chọn tuần');
+            }
+        }
+
+
+        $('#previousWeek').on('click', function () {
+            var currentWeekValue = $('#week').val();
+            var currentWeekNumber = parseInt(currentWeekValue.substring(6, 8));
+            var year = currentWeekValue.substring(0, 4);
+            var previousWeekNumber = currentWeekNumber - 1;
+
+            if (previousWeekNumber < 1) {
+                previousWeekNumber = 52; // Giới hạn lại tuần nếu vượt qua tuần 1
+                year = (parseInt(year) - 1).toString(); // Giảm năm khi quay lại tuần 52
+            }
+
+            var previousWeekValue = year + '-W' + String(previousWeekNumber).padStart(2, '0');
+            $('#week').val(previousWeekValue);
+            $('#week').trigger('change');
+        });
+
+        $('#currentWeek').on('click', function () {
+            $('#week').val(getCurrentWeek());
+            $('#week').trigger('change');
+        });
+
+        $('#nextWeek').on('click', function () {
+            var currentWeekValue = $('#week').val();
+            var currentWeekNumber = parseInt(currentWeekValue.substring(6, 8));
+            var year = currentWeekValue.substring(0, 4);
+            var nextWeekNumber = currentWeekNumber + 1;
+
+            if (nextWeekNumber > 52) {
+                nextWeekNumber = 1; // Giới hạn lại tuần nếu vượt quá tuần 52
+                year = (parseInt(year) + 1).toString(); // Tăng năm khi vượt qua tuần 52
+            }
+
+            var nextWeekValue = year + '-W' + String(nextWeekNumber).padStart(2, '0');
+            $('#week').val(nextWeekValue);
+            $('#week').trigger('change');
+        });
+
+        $(document).ready(function () {
+            $('#week').val(getCurrentWeek());
+            loadData();
+        });
+
+        $('#week').on('change', function (event) {
+            loadData();
+        });
+
+        $('.btn-close-modal').on('click', function () {
+            $('#employeeModal').modal('hide');
+        });
+
+        $(document).on('click', '.cell-shift', function (event) {
+            var button = $(this);
+            var shiftId = button.attr('data-shiftid');
+            var date = button.attr('data-date');
+            var shiftName = button.closest('tr').find('th').find('b').text() + ' ' + button.closest('tr').find('th').find('small').text();
+            listAddNew = [];
+            listDelete = [];
+            $('#employeeModalLabel').text('Xếp lịch cho ' + shiftName);
+            $('#employeeModal').find('#btn-save-checking').attr('data-shiftid', shiftId);
+            $('#employeeModal').find('#btn-save-checking').attr('data-date', date);
+            $('#employeeModal').modal('show');
+            $('#employeeList').html(`<h3 class="text-center text-danger">Đang tải dữ liệu...</h3>`);
+            $.ajax({
+                url: '@Url.Action("_GetListEmployeeManage", "Shift")',
+                method: 'post',
+                data: { shiftId, date },
+                success: function (res) {
+                    $('#employeeList').html(res);
+                }
+            })
+        });
+
+
+        $('#btn-save-checking').on('click', function () {
+            var shiftId = $(this).attr('data-shiftid');
+            var workDate = $(this).attr('data-date');
+            $.ajax({
+                url: '@Url.Action("SaveShiftRegistrations", "Shift")',
+                method: 'post',
+                data: {
+                    listAddNew: listAddNew,
+                    listDelete: listDelete,
+                    shiftId: shiftId,
+                    workDate: workDate,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        showToast("success", "Lưu thành công");
+                        loadData();
+                    } else {
+                        showAlert("error", "Có lỗi", response.error);
+                    }
+                },
+                error: function (error) {
+                    showAlert("error", "Có lỗi", error);
+                }
+            });
+        });
+    </script>
+    <script>
+        var listAddNew = [];
+        var listDelete = [];
+        $(document).on('change', '#select-all', function () {
+            var isChecked = document.getElementById('select-all').checked;
+            $('input[name=employees]').prop('checked', isChecked).trigger('change');
+        });
+
+        $(document).on('change', 'input[name=employees]', function () {
+            var employeeId = $(this).data('id');
+
+            if ($(this).is(':checked')) {
+                if (!listAddNew.includes(employeeId)) {
+                    listAddNew.push(employeeId);
+                }
+
+                var indexDelete = listDelete.indexOf(employeeId);
+                if (indexDelete !== -1) {
+                    listDelete.splice(indexDelete, 1);
+                }
+            } else {
+                if (!listDelete.includes(employeeId)) {
+                    listDelete.push(employeeId);
+                }
+
+                // Xóa khỏi listAddNew nếu có
+                var indexAdd = listAddNew.indexOf(employeeId);
+                if (indexAdd !== -1) {
+                    listAddNew.splice(indexAdd, 1);
+                }
+            }
+
+            console.log('Danh sách nhân viên được thêm mới:', listAddNew);
+            console.log('Danh sách nhân viên bị xóa:', listDelete);
+        });
+
+    </script>
+
+    <script>
+        // Hàm lọc danh sách nhân viên
+       $('#searchInput').on('input', function () {
+            var searchValue = this.value.toLowerCase(); // Lấy giá trị từ input và chuyển thành chữ thường
+            var employeeItems = document.querySelectorAll('.employee-item'); // Lấy tất cả phần tử nhân viên
+            employeeItems.forEach(function (item) {
+                var employeeName = item.getAttribute('data-name').toLowerCase(); // Lấy tên nhân viên
+                var employeeId = item.getAttribute('data-id'); // Lấy ID nhân viên
+
+                // Kiểm tra nếu tên hoặc ID nhân viên khớp với giá trị tìm kiếm
+                if (employeeName.includes(searchValue) || employeeId.includes(searchValue)) {
+                    item.classList.remove('d-none'); // Hiển thị nếu có kết quả khớp
+                } else {
+                    item.classList.add('d-none'); // Ẩn nếu không khớp
+                }
+            });
+        });
+    </script>
+}
